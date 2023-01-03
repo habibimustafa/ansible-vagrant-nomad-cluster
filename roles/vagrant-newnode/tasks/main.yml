@@ -13,10 +13,10 @@
 
 - debug: var=new_node_status['stdout_lines']
 
-- name: Put consul to inventory host
+- name: "Put {{ item.hostname }} to inventory host"
   add_host:
     name: "{{ item.ipv4_address }}"
-    groupname: vagrant_consul
+    groupname: "{{ item.group_name }}"
     ansible_user: vagrant
     ansible_python_interpreter: /usr/bin/python3
     host_key_checking: false

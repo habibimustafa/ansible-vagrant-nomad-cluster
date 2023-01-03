@@ -9,9 +9,9 @@
     - include_role:
         name: vagrant-newnode
       loop:
-        - { hostname: "consul-1", ipv4_address: "192.168.58.11" }
-        - { hostname: "consul-2", ipv4_address: "192.168.58.12" }
-        - { hostname: "consul-3", ipv4_address: "192.168.58.13" }
+        - { hostname: "consul-1", group_name: "vagrant_consul", ipv4_address: "192.168.58.11" }
+        - { hostname: "consul-2", group_name: "vagrant_consul", ipv4_address: "192.168.58.12" }
+        - { hostname: "consul-3", group_name: "vagrant_consul", ipv4_address: "192.168.58.13" }
 
 # provision consul
 - hosts: vagrant_consul
