@@ -1,0 +1,9 @@
+server          = false
+datacenter      = "dc1"
+node_name       = "{{ ansible_hostname }}"
+data_dir        = "/var/lib/consul"
+bind_addr       = "{{ ansible_enp0s8['ipv4']['address'] }}"
+client_addr     = "127.0.0.1"
+retry_join      = [ "192.168.58.11", "192.168.58.12", "192.168.58.13" ]
+log_level       = "DEBUG"
+enable_syslog   = true

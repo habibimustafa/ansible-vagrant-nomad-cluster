@@ -1,0 +1,10 @@
+---
+- name: Setting up server's timezone
+  timezone:
+    name: "{{ timezone }}"
+
+- name: Installing basics packages
+  apt:
+    name: "{{ basic_packages }}"
+    state: present
+    update-cache: true

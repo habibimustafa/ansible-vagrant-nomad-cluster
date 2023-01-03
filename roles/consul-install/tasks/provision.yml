@@ -1,0 +1,42 @@
+---
+- name: add hashicorp apt signing key
+  shell: "curl -fsSL {{ hashi_key }} | apt-key add -"
+
+- name: add consul repositories
+  apt_repository:
+    repo: "{{ hashi_repo }}"
+    filename: nomad
+    state: present
+    update_cache: no
+
+- name: Installing required packages
+  apt:
+    name: consul
+    state: present
+    update-cache: true
+
+- name: Create consul data directory
+  file:
+    path: /var/lib/consul
+    mode: "0755"
+    group: consul
+    owner: consul
+    state: directory
+
+- name: Set consul config to server mode
+  template:
+    src: conf.consul.server.j2
+    dest: /etc/consul.d/consul.hcl
+    owner: consul
+    group: consul
+    mode: 0600
+  when: consul_server is defined and consul_server == true
+
+- name: Set consul config to client mode
+  template:
+    src: conf.consul.client.j2
+    dest: /etc/consul.d/consul.hcl
+    owner: consul
+    group: consul
+    mode: 0600
+  when: consul_server is undefined or consul_server != true

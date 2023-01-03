@@ -1,0 +1,12 @@
+---
+- name: provision
+  include_tasks: provision.yml
+  when:
+    - consul_provision is defined
+    - consul_provision == true
+
+- name: start consul
+  include_tasks: starter.yml
+  when:
+    - consul_starter is defined
+    - consul_starter == true

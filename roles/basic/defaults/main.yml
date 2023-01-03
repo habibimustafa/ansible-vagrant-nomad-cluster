@@ -1,0 +1,8 @@
+timezone: "Asia/Jakarta"
+basic_packages:
+  - curl
+  - git
+  - zip
+  - openssl
+  - gcc
+  - make

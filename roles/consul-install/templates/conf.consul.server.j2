@@ -1,0 +1,16 @@
+server              = true
+node_name           = "{{ ansible_hostname }}"
+datacenter          = "dc1"
+data_dir            = "/var/lib/consul"
+bind_addr           = "0.0.0.0"
+client_addr         = "0.0.0.0"
+advertise_addr      = "{{ ansible_enp0s8['ipv4']['address'] }}"
+bootstrap_expect    = 3
+retry_join          = [ "192.168.58.11", "192.168.58.12", "192.168.58.13" ]
+
+ui_config {
+    enabled = true
+}
+
+log_level           = "DEBUG"
+enable_syslog       = true

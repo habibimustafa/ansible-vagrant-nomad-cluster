@@ -1,0 +1,39 @@
+### CONSUL
+
+# create nodes
+- hosts: local
+  become: true
+  become_user: "{{ act_as }}"
+
+  tasks:
+    - include_role:
+        name: vagrant-newnode
+      loop:
+        - { hostname: "consul-1", ipv4_address: "192.168.58.11" }
+        - { hostname: "consul-2", ipv4_address: "192.168.58.12" }
+        - { hostname: "consul-3", ipv4_address: "192.168.58.13" }
+
+# provision consul
+- hosts: vagrant_consul
+  become: true
+
+  vars:
+    ansible_host_key_checking: false
+    consul_provision: true
+    consul_server: true
+
+  roles:
+    - basic
+    - consul-install
+
+# starting consul
+- hosts: vagrant_consul
+  become: true
+  serial: true
+
+  vars:
+    ansible_host_key_checking: false
+    consul_starter: true
+
+  roles:
+    - consul-install
