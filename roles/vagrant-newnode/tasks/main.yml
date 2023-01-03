@@ -1,11 +1,11 @@
 ---
-- name: Delete existing node if available
+- name: "Delete node {{ item.hostname }} if available"
   shell: "vagrant destroy -f {{ item.hostname }}"
   args:
     chdir: "{{ playbook_dir }}"
   ignore_errors: true
 
-- name: Bootstrapping node
+- name: "Bootstrapping node {{ item.hostname }}"
   shell: "vagrant up {{ item.hostname }}"
   args:
     chdir: "{{ playbook_dir }}"
