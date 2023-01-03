@@ -1,23 +1,22 @@
 ---
-- name: delete existing node if available
-  shell: vagrant destroy -f consul-1 consul-2 consul-3
+- name: Delete existing node if available
+  shell: "vagrant destroy -f {{ new_node.hostname }}"
   args:
     chdir: "{{ playbook_dir }}"
   ignore_errors: true
 
-- name: bootstrapping node
-  shell: vagrant up consul-1 consul-2 consul-3
+- name: Bootstrapping node
+  shell: "vagrant up {{ new_node.hostname }}"
   args:
     chdir: "{{ playbook_dir }}"
+  register: new_node_status
 
-- name: put consul to inventory host
+- debug: var=new_node_status['stdout_lines']
+
+- name: Put consul to inventory host
   add_host:
-    name: "{{ item }}"
+    name: "{{ new_node.ipv4_address }}"
     groupname: vagrant_consul
     ansible_user: vagrant
     ansible_python_interpreter: /usr/bin/python3
     host_key_checking: false
-  with_items:
-    - 192.168.58.11
-    - 192.168.58.12
-    - 192.168.58.13
