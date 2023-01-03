@@ -1,0 +1,16 @@
+---
+- name: Create vagrantfile
+  template:
+    src: conf.vagrantfile.j2
+    dest: "{{ playbook_dir }}/Vagrantfile"
+    owner: "{{ act_as }}"
+    group: "{{ act_as }}"
+    mode: 0600
+
+- name: Check vagrant status
+  shell: vagrant status
+  args:
+    chdir: "{{ playbook_dir }}"
+  register: vagrant_status
+
+- debug: var=vagrant_status['stdout_lines']
