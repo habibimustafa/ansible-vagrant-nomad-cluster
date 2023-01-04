@@ -1,11 +1,8 @@
-vagrant:
+vagrant-init:
 	ansible-playbook -vv create-vagrant.yml --ask-become-pass
 
-consul:
+consul-init:
 	ansible-playbook -vv create-consul-cluster.yml --ask-become-pass
 
-nomad:
+nomad-init:
 	ansible-playbook -vv create-nomad-cluster.yml --ask-become-pass
-
-destroy:
-	vagrant destroy
