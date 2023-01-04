@@ -1,22 +1,27 @@
 ---
-- name: "Delete node {{ item.hostname }} if available"
-  shell: "vagrant destroy -f {{ item.hostname }}"
+- set_fact:
+    node_hostname: "{{ node_group }}-{{ node_index|int + 1 }}"
+    node_group_name: "vagrant_{{ node_group }}"
+    node_ipv4_address: "{{ node }}"
+
+- name: "Delete node {{ node_hostname }} if available"
+  shell: "vagrant destroy -f {{ node_hostname }}"
   args:
     chdir: "{{ playbook_dir }}"
   ignore_errors: true
 
-- name: "Bootstrapping node {{ item.hostname }}"
-  shell: "vagrant up {{ item.hostname }}"
+- name: "Bootstrapping node {{ node_hostname }}"
+  shell: "vagrant up {{ node_hostname }}"
   args:
     chdir: "{{ playbook_dir }}"
   register: new_node_status
 
 - debug: var=new_node_status['stdout_lines']
 
-- name: "Put {{ item.hostname }} to inventory host"
+- name: "Put {{ node_hostname }} to inventory host"
   add_host:
-    name: "{{ item.ipv4_address }}"
-    groupname: "{{ item.group_name }}"
+    name: "{{ node_ipv4_address }}"
+    groupname: "{{ node_group_name }}"
     ansible_user: vagrant
     ansible_python_interpreter: /usr/bin/python3
     host_key_checking: false
