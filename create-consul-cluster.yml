@@ -5,6 +5,10 @@
   become: true
   become_user: "{{ act_as }}"
 
+  vars:
+    host_prefix: "consul"
+    host_group: "vagrant_consul"
+
   vars_files:
     - vars/variables.prod.yml
 
