@@ -1,0 +1,12 @@
+---
+- name: provision
+  include_tasks: provision.yml
+  when:
+    - nomad_provision is defined
+    - nomad_provision == true
+
+- name: start nomad
+  include_tasks: starter.yml
+  when:
+    - nomad_starter is defined
+    - nomad_starter == true

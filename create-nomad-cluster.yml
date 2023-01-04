@@ -1,0 +1,62 @@
+### NOMAD
+# create nodes
+- hosts: local
+  become: true
+  become_user: "{{ act_as }}"
+
+  vars:
+    node_group: "nomad"
+
+  vars_files:
+    - vars/variables.prod.yml
+
+  tasks:
+    - include_role:
+        name: vagrant-newnode
+      loop: nomad_clusters
+      loop_control:
+        loop_var: node
+        index_var: node_idx
+
+# provision
+- hosts: vagrant_nomad
+  become: true
+  gather_facts: no
+
+  vars:
+    ansible_host_key_checking: false
+    consul_provision: true
+    consul_starter: true
+    nomad_provision: true
+    nomad_server: true
+
+  tasks:
+    - name: Waiting for new instance ready
+      wait_for_connection:
+        timeout: 60
+
+    - debug: msg="Ready to connect new node"
+
+    - name: Gather node facts
+      setup:
+
+    - include_role:
+        name: basic
+
+    - include_role:
+        name: consul-install
+
+    - include_role:
+        name: nomad-install
+
+# starting nomad
+- hosts: vagrant_nomad
+  become: true
+  serial: true
+
+  vars:
+    ansible_host_key_checking: false
+    nomad_starter: true
+
+  roles:
+    - nomad-install

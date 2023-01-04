@@ -1,0 +1,12 @@
+- name: Restart nomad service
+  systemd:
+    name: nomad
+    state: restarted
+    enabled: true
+    daemon_reload: yes
+
+- name: Initialize acl
+  shell: nomad acl bootstrap -json
+  register: nomad_acl
+
+- name: Save acl

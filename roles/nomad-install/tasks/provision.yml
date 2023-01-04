@@ -1,0 +1,34 @@
+---
+- name: add hashicorp apt signing key
+  shell: "curl -fsSL {{ hashi_key }} | apt-key add -"
+
+- name: add consul repositories
+  apt_repository:
+    repo: "{{ hashi_repo }}"
+    filename: nomad
+    state: present
+    update_cache: no
+
+- name: Installing required packages
+  apt:
+    name: nomad
+    state: present
+    update-cache: true
+
+- name: Set nomad config to server mode
+  template:
+    src: conf.nomad.server.j2
+    dest: /etc/nomad.d/nomad.hcl
+    owner: nomad
+    group: nomad
+    mode: 0600
+  when: nomad_server is defined and nomad_server == true
+
+- name: Set nomad config to client mode
+  template:
+    src: conf.nomad.worker.j2
+    dest: /etc/nomad.d/nomad.hcl
+    owner: nomad
+    group: nomad
+    mode: 0600
+  when: nomad_server is undefined or nomad_server != true

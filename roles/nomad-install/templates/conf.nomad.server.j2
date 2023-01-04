@@ -1,0 +1,30 @@
+# Full configuration options can be found at https://www.nomadproject.io/docs/configuration
+
+data_dir    = "/opt/nomad/data"
+bind_addr   = "0.0.0.0"
+datacenter  = "dc1"
+
+advertise {
+  http = "{{ ansible_enp0s8['ipv4']['address'] }}"
+  rpc  = "{{ ansible_enp0s8['ipv4']['address'] }}"
+  serf = "{{ ansible_enp0s8['ipv4']['address'] }}"
+}
+
+server {
+  enabled          = true
+  bootstrap_expect = 3
+}
+
+acl {
+  enabled = true
+}
+
+consul {
+  address             = "127.0.0.1:8500"
+  server_service_name = "nomad"
+  client_service_name = "nomad-client"
+  auto_advertise      = true
+  server_auto_join    = true
+  client_auto_join    = true
+}
+
