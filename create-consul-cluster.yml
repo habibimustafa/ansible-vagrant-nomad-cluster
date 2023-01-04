@@ -16,6 +16,9 @@
     - include_role:
         name: vagrant-newnode
       loop: consul_clusters
+      loop_control:
+        loop_var: node
+        index_var: node_idx
 
 # provision consul
 - hosts: vagrant_consul
