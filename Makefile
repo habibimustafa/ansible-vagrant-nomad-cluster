@@ -11,3 +11,6 @@ start:
 	vagrant-init
 	consul-init
 	nomad-init
+
+destroy:
+	vagrant destroy
