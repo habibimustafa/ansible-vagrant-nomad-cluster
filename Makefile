@@ -6,3 +6,6 @@ consul:
 
 nomad:
 	ansible-playbook -vv create-nomad-cluster.yml --ask-become-pass
+
+destroy:
+	vagrant destroy
