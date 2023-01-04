@@ -13,7 +13,7 @@
   tasks:
     - include_role:
         name: vagrant-newnode
-      loop: nomad_clusters
+      loop: "{{ nomad_clusters }}"
       loop_control:
         loop_var: node
         index_var: node_idx
