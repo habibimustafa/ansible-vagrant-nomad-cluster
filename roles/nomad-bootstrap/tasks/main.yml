@@ -15,12 +15,10 @@
     dest: "{{ acl_filepath }}"
     mode: 644
 
-- name: Save nomad token
-  environment:
-    NOMAD_TOKEN: "{{ nomad_acl.SecretID }}"
-
 - name: Check nomad status
   shell: nomad status
+  environment:
+    NOMAD_TOKEN: "{{ nomad_acl.SecretID }}"
   register: nomad_status
 
 - debug: var=nomad_status
