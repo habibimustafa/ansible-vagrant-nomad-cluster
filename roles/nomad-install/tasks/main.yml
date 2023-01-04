@@ -32,3 +32,11 @@
     group: nomad
     mode: 0600
   when: nomad_server is undefined or nomad_server != true
+
+- name: Restart nomad service
+  systemd:
+    name: nomad
+    state: restarted
+    enabled: true
+    daemon_reload: yes
+  when: nomad_server is undefined or nomad_server != true
