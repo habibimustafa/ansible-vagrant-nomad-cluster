@@ -1,6 +1,6 @@
 ---
 - set_fact:
-    node_hostname: "{{ node_group }}-{{ node_index|int + 1 }}"
+    node_hostname: "{{ node_group }}-{{ node_idx|int + 1 }}"
     node_group_name: "vagrant_{{ node_group }}"
     node_ipv4_address: "{{ node }}"
 
