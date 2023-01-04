@@ -53,6 +53,20 @@
 
   vars:
     ansible_host_key_checking: false
+
+  tasks:
+    - name: Restart nomad service
+      systemd:
+        name: nomad
+        state: restarted
+        enabled: true
+        daemon_reload: yes
+
+# bootstrap acl
+- hosts: "{{ nomad_clusters[0] }}"
+  become: true
+  vars:
+    ansible_host_key_checking: false
     acl_filepath: /home/vagrant/.nomad/acl.json
 
   roles:
