@@ -5,8 +5,22 @@
     enabled: true
     daemon_reload: yes
 
-- name: Initialize acl
+- name: Initialize ACL
   shell: nomad acl bootstrap -json
   register: nomad_acl
 
-- name: Save acl
+- name: Copy ACL to file
+  copy:
+    content: "{{ nomad_acl }}"
+    dest: "{{ acl_filepath }}"
+    mode: 644
+
+- name: Save nomad token
+  environment:
+    NOMAD_TOKEN: "{{ nomad_acl.SecretID }}"
+
+- name: Check nomad status
+  shell: nomad status
+  register: nomad_status
+
+- debug: var=nomad_status
