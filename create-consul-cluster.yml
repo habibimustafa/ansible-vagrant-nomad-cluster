@@ -6,8 +6,7 @@
   become_user: "{{ act_as }}"
 
   vars:
-    host_prefix: "consul"
-    host_group: "vagrant_consul"
+    node_group: "consul"
 
   vars_files:
     - vars/variables.prod.yml
