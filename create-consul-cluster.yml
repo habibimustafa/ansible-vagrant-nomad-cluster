@@ -25,7 +25,6 @@
 
   vars:
     ansible_host_key_checking: false
-    consul_provision: true
     consul_server: true
 
   roles:
@@ -39,7 +38,11 @@
 
   vars:
     ansible_host_key_checking: false
-    consul_starter: true
 
-  roles:
-    - consul-install
+  tasks:
+    - name: Start consul service
+      systemd:
+        name: consul
+        state: started
+        enabled: true
+        daemon_reload: yes
