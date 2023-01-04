@@ -25,9 +25,6 @@
 
   vars:
     ansible_host_key_checking: false
-    consul_provision: true
-    consul_starter: true
-    nomad_provision: true
     nomad_server: true
 
   tasks:
@@ -56,7 +53,6 @@
 
   vars:
     ansible_host_key_checking: false
-    nomad_starter: true
 
   roles:
-    - nomad-install
+    - nomad-bootstrap
