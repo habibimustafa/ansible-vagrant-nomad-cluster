@@ -6,3 +6,8 @@ consul-init:
 
 nomad-init:
 	ansible-playbook -vv create-nomad-cluster.yml --ask-become-pass
+
+start:
+	vagrant-init
+	consul-init
+	nomad-init
