@@ -9,11 +9,19 @@
     state: present
     update_cache: no
 
-- name: Installing required packages
+- name: Installing latest nomad version
   apt:
     name: nomad
     state: present
     update-cache: true
+  when: nomad_version is undefined
+
+- name: "Installing nomad v{{ nomad_version }}"
+  apt:
+    name: "nomad={{ nomad_version }}}"
+    state: present
+    update-cache: true
+  when: nomad_version is defined
 
 - name: Set nomad config to server mode
   template:
