@@ -9,11 +9,19 @@
     state: present
     update_cache: no
 
-- name: Installing required packages
+- name: Installing latest consul version
   apt:
     name: consul
     state: present
     update-cache: true
+  when: consul_version is undefined
+
+- name: "Installing consul v{{ consul_version }}}"
+  apt:
+    name: "consul={{ consul_version }}"
+    state: present
+    update-cache: true
+  when: consul_version is defined
 
 - name: Create consul data directory
   file:
