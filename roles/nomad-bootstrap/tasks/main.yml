@@ -22,4 +22,4 @@
     NOMAD_TOKEN: "{{ (nomad_acl.stdout|from_json).SecretID }}"
   register: nomad_status
 
-- debug: var=nomad_status
+- debug: var=nomad_status.stdout
