@@ -8,6 +8,7 @@
     state: directory
     mode: 600
   become: true
+  become_user: vagrant
 
 - name: Copy ACL to file
   copy:
@@ -15,6 +16,7 @@
     dest: "{{ acl_filepath }}/acl.json"
     mode: 644
   become: true
+  become_user: vagrant
 
 - name: Check nomad status
   shell: nomad status
