@@ -11,9 +11,8 @@
   vars_files:
     - vars/variables.prod.yml
 
-  tasks:
-    - include_role:
-        name: vagrant-newnode
+  roles:
+    - vagrant-newnode
 
 # provision
 - hosts: vagrant_nomad
