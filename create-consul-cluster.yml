@@ -7,6 +7,7 @@
 
   vars:
     node_group: "consul"
+    node_clusters: "{{ consul_clusters }}"
 
   vars_files:
     - vars/variables.prod.yml
@@ -14,10 +15,6 @@
   tasks:
     - include_role:
         name: vagrant-newnode
-      loop: "{{ consul_clusters }}"
-      loop_control:
-        loop_var: node
-        index_var: node_idx
 
 # provision consul
 - hosts: vagrant_consul
