@@ -19,7 +19,7 @@
 - name: Check nomad status
   shell: nomad status
   environment:
-    NOMAD_TOKEN: "{{ nomad_acl.SecretID }}"
+    NOMAD_TOKEN: "{{ (nomad_acl|from_json).SecretID }}"
   register: nomad_status
 
 - debug: var=nomad_status
