@@ -1,27 +1,30 @@
 ---
 - set_fact:
-    node_hostname: "{{ node_group }}-{{ node_idx|int + 1 }}"
+    node_hostnames: "{{ node_clusters|map('last')|product(['nomad'])|map('reverse')|map('join', '-')|join(' ') }}"
     node_group_name: "vagrant_{{ node_group }}"
-    node_ipv4_address: "{{ node }}"
 
-- name: "Delete node {{ node_hostname }} if available"
-  shell: "vagrant destroy -f {{ node_hostname }}"
+- name: "Delete node {{ node_hostnames }} if available"
+  shell: "vagrant destroy -f {{ node_hostnames }}"
   args:
     chdir: "{{ playbook_dir }}"
   ignore_errors: true
 
-- name: "Bootstrapping node {{ node_hostname }}"
-  shell: "vagrant up {{ node_hostname }}"
+- name: "Bootstrapping node {{ node_hostnames }}"
+  shell: "vagrant up {{ node_hostnames }}"
   args:
     chdir: "{{ playbook_dir }}"
   register: new_node_status
 
 - debug: var=new_node_status['stdout_lines']
 
-- name: "Put {{ node_hostname }} to inventory host"
+- name: "Put {{ node_hostnames }} to inventory host"
   add_host:
-    name: "{{ node_ipv4_address }}"
+    name: "nomad-{{ node_ipv4_address|last }}"
     groupname: "{{ node_group_name }}"
+    ansible_host: "{{ node_ipv4_address }}"
     ansible_user: vagrant
     ansible_python_interpreter: /usr/bin/python3
     host_key_checking: false
+  loop: "{{ node_clusters }}"
+  loop_control:
+    loop_var: node_ipv4_address

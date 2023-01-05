@@ -6,6 +6,7 @@
 
   vars:
     node_group: "nomad"
+    node_clusters: "{{ nomad_clusters }}"
 
   vars_files:
     - vars/variables.prod.yml
@@ -13,10 +14,6 @@
   tasks:
     - include_role:
         name: vagrant-newnode
-      loop: "{{ nomad_clusters }}"
-      loop_control:
-        loop_var: node
-        index_var: node_idx
 
 # provision
 - hosts: vagrant_nomad
