@@ -5,3 +5,4 @@
 Vagrantfile
 **/*.log
 **/*.prod.yml
+**/*test.yml
