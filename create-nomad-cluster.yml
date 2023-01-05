@@ -63,7 +63,6 @@
   become: true
   vars:
     ansible_host_key_checking: false
-    acl_filepath: /home/vagrant/.nomad
 
   roles:
     - nomad-bootstrap
