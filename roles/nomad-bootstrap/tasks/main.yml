@@ -11,7 +11,7 @@
 
 - name: Copy ACL to file
   copy:
-    content: "{{ nomad_acl }}"
+    content: "{{ nomad_acl.stdout }}"
     dest: "{{ acl_filepath }}/acl.json"
     mode: 644
   become: true
@@ -19,7 +19,7 @@
 - name: Check nomad status
   shell: nomad status
   environment:
-    NOMAD_TOKEN: "{{ (nomad_acl|from_json).SecretID }}"
+    NOMAD_TOKEN: "{{ (nomad_acl.stdout|from_json).SecretID }}"
   register: nomad_status
 
 - debug: var=nomad_status
