@@ -2,10 +2,16 @@
   shell: nomad acl bootstrap -json
   register: nomad_acl
 
+- name: Create acl directory
+  file:
+    path: "{{ acl_filepath }}"
+    state: directory
+    mode: 600
+
 - name: Copy ACL to file
   copy:
     content: "{{ nomad_acl }}"
-    dest: "{{ acl_filepath }}"
+    dest: "{{ acl_filepath }}/acl.json"
     mode: 644
 
 - name: Check nomad status
