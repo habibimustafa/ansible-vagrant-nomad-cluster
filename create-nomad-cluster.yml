@@ -60,7 +60,7 @@
         daemon_reload: yes
 
 # bootstrap acl
-- hosts: "{{ nomad_clusters[0] }}"
+- hosts: nomad-1
   become: true
   vars:
     ansible_host_key_checking: false
