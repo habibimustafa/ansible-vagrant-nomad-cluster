@@ -1,0 +1,6 @@
+---
+- name: Waiting for new instance ready
+  wait_for_connection:
+    timeout: 60
+
+- debug: msg="Ready to connect new node"

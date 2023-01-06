@@ -15,6 +15,17 @@
   roles:
     - vagrant-newnode
 
+# wait node ready
+- hosts: vagrant_consul
+  become: true
+  gather_facts: no
+
+  vars:
+    ansible_host_key_checking: false
+
+  roles:
+    - node-wait
+
 # provision consul
 - hosts: vagrant_consul
   become: true
