@@ -1,6 +1,6 @@
 ---
 - set_fact:
-    node_hostnames: "{{ node_clusters|map('last')|product(['nomad'])|map('reverse')|map('join', '-')|join(' ') }}"
+    node_hostnames: "{{ node_clusters|map('last')|product([node_group])|map('reverse')|map('join', '-')|join(' ') }}"
     node_group_name: "vagrant_{{ node_group }}"
 
 - name: "Delete node {{ node_hostnames }} if available"
@@ -19,7 +19,7 @@
 
 - name: "Put {{ node_hostnames }} to inventory host"
   add_host:
-    name: "nomad-{{ node_ipv4_address|last }}"
+    name: "{{ node_group }}-{{ node_ipv4_address|last }}"
     groupname: "{{ node_group_name }}"
     ansible_host: "{{ node_ipv4_address }}"
     ansible_user: vagrant
