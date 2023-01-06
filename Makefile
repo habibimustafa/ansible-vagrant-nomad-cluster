@@ -10,10 +10,7 @@ nomad-cluster:
 	export ANSIBLE_HOST_KEY_CHECKING=False && \
 	ansible-playbook -vv create-nomad-cluster.yml --ask-become-pass
 
-start:
-	vagrant-init
-	consul-cluster
-	nomad-cluster
+start: vagrant-init consul-cluster nomad-cluster
 
 destroy:
 	vagrant destroy
