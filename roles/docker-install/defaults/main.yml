@@ -1,6 +1,10 @@
 docker_repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu bionic stable"
 docker_key: "https://download.docker.com/linux/ubuntu/gpg"
 docker_packages:
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
   - docker-ce
   - docker-ce-cli
   - containerd.io
