@@ -6,7 +6,7 @@
   file:
     path: "{{ acl_filepath }}"
     state: directory
-    mode: 600
+    mode: 0755
     owner: vagrant
     group: vagrant
 
@@ -14,7 +14,7 @@
   copy:
     content: "{{ nomad_acl.stdout }}"
     dest: "{{ acl_filepath }}/acl.json"
-    mode: 644
+    mode: 0644
     owner: vagrant
     group: vagrant
 
