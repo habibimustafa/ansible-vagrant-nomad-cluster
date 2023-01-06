@@ -44,7 +44,7 @@
 - name: Add nomad user to docker group
   user:
     name: nomad
-    group: docker
+    groups: docker
     append: yes
   when: nomad_server is undefined or nomad_server != true
 
