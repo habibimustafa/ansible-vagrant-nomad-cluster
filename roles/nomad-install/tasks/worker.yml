@@ -1,0 +1,20 @@
+- name: Set nomad config to client mode
+  template:
+    src: conf.nomad.worker.j2
+    dest: /etc/nomad.d/nomad.hcl
+    owner: nomad
+    group: nomad
+    mode: 0600
+
+- name: Add nomad user to docker group
+  user:
+    name: nomad
+    groups: docker
+    append: yes
+
+- name: Restart nomad service
+  systemd:
+    name: nomad
+    state: restarted
+    enabled: true
+    daemon_reload: yes
