@@ -20,9 +20,6 @@
   become: true
   gather_facts: no
 
-  vars:
-    ansible_host_key_checking: false
-
   roles:
     - node-wait
 
@@ -31,7 +28,6 @@
   become: true
 
   vars:
-    ansible_host_key_checking: false
     consul_server: true
 
   roles:
@@ -42,9 +38,6 @@
 - hosts: vagrant_consul
   become: true
   serial: true
-
-  vars:
-    ansible_host_key_checking: false
 
   tasks:
     - name: Start consul service

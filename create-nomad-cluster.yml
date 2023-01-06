@@ -19,9 +19,6 @@
   become: true
   gather_facts: no
 
-  vars:
-    ansible_host_key_checking: false
-
   roles:
     - node-wait
 
@@ -30,7 +27,6 @@
   become: true
 
   vars:
-    ansible_host_key_checking: false
     nomad_server: true
 
   roles:
@@ -43,9 +39,6 @@
   become: true
   serial: true
 
-  vars:
-    ansible_host_key_checking: false
-
   tasks:
     - name: Restart nomad service
       systemd:
@@ -57,8 +50,6 @@
 # bootstrap acl
 - hosts: nomad-1
   become: true
-  vars:
-    ansible_host_key_checking: false
 
   roles:
     - nomad-bootstrap
