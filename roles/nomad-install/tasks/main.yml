@@ -41,6 +41,13 @@
     mode: 0600
   when: nomad_server is undefined or nomad_server != true
 
+- name: Add nomad user to docker group
+  user:
+    name: nomad
+    group: docker
+    append: yes
+  when: nomad_server is undefined or nomad_server != true
+
 - name: Restart nomad service
   systemd:
     name: nomad
