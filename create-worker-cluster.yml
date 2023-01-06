@@ -1,0 +1,33 @@
+### WORKER
+# create nodes
+- hosts: local
+  become: true
+  become_user: "{{ act_as }}"
+
+  vars:
+    node_group: "worker"
+    node_clusters: "{{ worker_clusters }}"
+
+  vars_files:
+    - vars/variables.prod.yml
+
+  roles:
+    - vagrant-newnode
+
+# wait node ready
+- hosts: vagrant_worker
+  become: true
+  gather_facts: no
+
+  roles:
+    - node-wait
+
+# provision
+- hosts: vagrant_worker
+  become: true
+
+  roles:
+    - basic
+    - docker-install
+    - consul-install
+    - nomad-install
