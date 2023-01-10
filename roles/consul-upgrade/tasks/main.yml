@@ -48,5 +48,32 @@
     daemon_reload: yes
 
 - name: Wait until this consul alive
+  shell: "consul operator raft list-peers | grep {{ ansible_hostname }} | sed 's/  */ /g' | cut -d ' ' -f 5"
+  register: list_peers
+  until: list_peers.stdout|bool == true
+  retries: 5
+  delay: 4
+
+- name: Get to be checked consul service
+  shell: consul catalog services | head -1 | xargs
+  register: consul_service
+
+- name: Get to be checked consul datacenters
+  shell: consul catalog datacenters | head -1 | xargs
+  register: consul_datacenter
+
+- name: Dig test consul service
+  shell: "dig @127.0.0.1 -p 8600 {{ consul_service.stdout|trim }}.service.{{ consul_datacenter.stdout|trim }}.consul. ANY | grep ANSWER |  cut -d ' ' -f 9 |  sed 's/,//' |  xargs"
+  register: dig_test
+
+- debug:
+    msg: Dig test success
+  when: dig_test.stdout|int > 0
+
+- fail:
+    msg: Dig test failed
+  when: dig_test.stdout|int < 1
+
+- name: Take a short break before moving on to the next host
   wait_for:
-    timeout: 20
+    timeout: 5
