@@ -60,6 +60,13 @@
     msg: "Consul version is not match. Current version is {{ consul_version_check.stdout }}"
   when: consul_version_check.stdout != consul_version|split('-')|first
 
+- name: Wait until this consul alive
+  shell: "consul members | grep {{ ansible_hostname }} | sed 's/  */ /g' | cut -d ' ' -f 3 | xargs"
+  register: consul_stat
+  until: consul_stat.stdout == alive
+  retries: 5
+  delay: 4
+
 - name: Wait until this consul can vote
   shell: "consul operator raft list-peers | grep {{ ansible_hostname }} | sed 's/  */ /g' | cut -d ' ' -f 5"
   register: list_peers
