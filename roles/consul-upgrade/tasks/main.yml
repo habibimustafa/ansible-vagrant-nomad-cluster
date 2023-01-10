@@ -68,7 +68,7 @@
   delay: 4
 
 - name: Wait until this consul can vote
-  shell: "consul operator raft list-peers | grep {{ ansible_hostname }} | sed 's/  */ /g' | cut -d ' ' -f 5"
+  shell: "consul operator raft list-peers | grep {{ ansible_hostname }} | sed 's/  */ /g' | cut -d ' ' -f 5 | xargs"
   register: list_peers
   until: list_peers.stdout|bool == true
   retries: 5
