@@ -1,0 +1,34 @@
+---
+- hosts: local
+  become: true
+
+  vars_files:
+    - vars/variables.prod.yml
+
+  tasks:
+    - name: Put consul to inventory host
+      add_host:
+        name: "consul-{{ node_ipv4_address|last }}"
+        groupname: consul_cluster
+        ansible_host: "{{ node_ipv4_address }}"
+        ansible_user: vagrant
+        ansible_python_interpreter: /usr/bin/python3
+        host_key_checking: false
+      loop: "{{ consul_clusters }}"
+      loop_control:
+        loop_var: node_ipv4_address
+
+- hosts: consul_cluster
+  become: true
+  serial: true
+
+  vars:
+    ansible_host_key_checking: false
+
+  vars_prompt:
+    - name: consul_version
+      prompt: Which version will Consul be upgraded?
+      private: no
+
+  roles:
+    - consul-upgrade

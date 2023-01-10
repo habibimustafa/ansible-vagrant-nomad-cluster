@@ -1,0 +1,52 @@
+---
+- name: Create consul snapshot for backup
+  shell: consul snapshot save consul-backup.snap
+
+- name: Inspect the created snapshot
+  shell: consul snapshot inspect consul-backup.snap
+  register: backup_snap_inpection
+
+- name: Save consul snapshot inspection to file
+  copy:
+    content: "{{ backup_snap_inpection.stdout }}"
+    dest: consul-backup.inspect
+
+- name: Enabling debug level
+  lineinfile:
+    path: /etc/consul.d/consul.hcl
+    line: "log_level       = \"DEBUG\""
+    regexp: "^log_level\\s+=\\s+\"DEBUG\"$"
+    insertafter: "EOF"
+    state: present
+
+- name: Reload Consul
+  shell: consul reload
+
+- name: Check who is current leader
+  shell: consul operator raft list-peers | grep leader
+
+- name: Leave from the cluster
+  shell: consul leave
+
+- name: Download new version binary of consul
+  apt:
+    name: "consul={{ consul_version }}"
+    state: present
+    update_cache: true
+
+- name: Disabling debug level
+  lineinfile:
+    path: /etc/consul.d/consul.hcl
+    regexp: "log_level\\s+=\\s+\"DEBUG\""
+    state: absent
+
+- name: Restart Consul
+  systemd:
+    name: consul
+    state: restarted
+    enabled: true
+    daemon_reload: yes
+
+- name: Wait until this consul alive
+  wait_for:
+    timeout: 20
