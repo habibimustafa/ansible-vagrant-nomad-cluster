@@ -86,7 +86,3 @@
 - fail:
     msg: Dig test failed
   when: dig_test.stdout|int < 1
-
-- name: Take a short break before moving on to the next host
-  wait_for:
-    timeout: 5
