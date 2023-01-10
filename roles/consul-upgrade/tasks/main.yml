@@ -1,6 +1,10 @@
 ---
 - name: Create consul snapshot for backup
   shell: consul snapshot save consul-backup.snap
+  retries: 3
+  delay: 3
+  register: consul_snap
+  until: consul_snap.rc == 0
 
 - name: Inspect the created snapshot
   shell: consul snapshot inspect consul-backup.snap
