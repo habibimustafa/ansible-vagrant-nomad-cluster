@@ -63,7 +63,7 @@
 - name: Wait until this consul alive
   shell: "consul members | grep {{ ansible_hostname }} | sed 's/  */ /g' | cut -d ' ' -f 3 | xargs"
   register: consul_stat
-  until: consul_stat.stdout == alive
+  until: consul_stat.stdout == 'alive'
   retries: 5
   delay: 4
 
