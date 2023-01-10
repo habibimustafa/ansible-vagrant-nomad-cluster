@@ -16,7 +16,7 @@
     update-cache: true
   when: consul_version is undefined
 
-- name: "Installing consul v{{ consul_version }}}"
+- name: "Installing consul v{{ consul_version }}"
   apt:
     name: "consul={{ consul_version }}"
     state: present
