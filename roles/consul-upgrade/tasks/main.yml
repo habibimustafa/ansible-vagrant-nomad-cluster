@@ -67,9 +67,14 @@
   retries: 3
   delay: 3
 
+- name: Check is consul server or client
+  shell: "consul members | grep {{ ansible_hostname }} | sed 's/  */ /g' | cut -d ' ' -f 4 | xargs"
+  register: consul_mode
+
 - name: Wait until this consul can vote
   shell: "consul operator raft list-peers | grep {{ ansible_hostname }} | sed 's/  */ /g' | cut -d ' ' -f 5 | xargs"
   register: list_peers
+  when: consul_mode.stdout == 'server'
   until: list_peers.stdout|bool == true
   retries: 5
   delay: 4
