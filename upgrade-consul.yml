@@ -2,19 +2,25 @@
 - hosts: local
   become: true
 
-  vars_files:
-    - vars/variables.prod.yml
+  vars:
+    - node_clusters:
+        - "192.168.58.11"
+        - "192.168.58.12"
+        - "192.168.58.13"
+        - "192.168.58.21"
+        - "192.168.58.22"
+        - "192.168.58.23"
 
   tasks:
     - name: Put consul to inventory host
       add_host:
-        name: "consul-{{ node_ipv4_address|last }}"
+        name: "{{ node_ipv4_address }}"
         groupname: consul_cluster
         ansible_host: "{{ node_ipv4_address }}"
         ansible_user: vagrant
         ansible_python_interpreter: /usr/bin/python3
         host_key_checking: false
-      loop: "{{ consul_clusters }}"
+      loop: "{{ node_clusters }}"
       loop_control:
         loop_var: node_ipv4_address
 
