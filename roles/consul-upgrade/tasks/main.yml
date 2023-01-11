@@ -88,7 +88,7 @@
   register: consul_datacenter
 
 - name: Dig test consul service
-  shell: "dig @127.0.0.1 -p 8600 {{ consul_service.stdout|trim }}.service.{{ consul_datacenter.stdout|trim }}.consul. ANY | grep ANSWER |  cut -d ' ' -f 9 |  sed 's/,//' |  xargs"
+  shell: "dig @127.0.0.1 -p 8600 {{ consul_service.stdout|trim }}.service.{{ consul_datacenter.stdout|trim }}.consul. ANY | grep ANSWER | head -1 | cut -d ' ' -f 9 |  sed 's/,//' |  xargs"
   register: dig_test
 
 - debug:
