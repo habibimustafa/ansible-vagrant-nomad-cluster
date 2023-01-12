@@ -6,7 +6,6 @@
 
   vars:
     node_group: "worker"
-    node_clusters: "{{ worker_clusters }}"
 
   vars_files:
     - vars/variables.prod.yml

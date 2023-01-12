@@ -1,5 +1,8 @@
 ---
 - set_fact:
+    node_clusters: "{{ clusters[node_group] }}"
+
+- set_fact:
     node_hostnames: "{{ node_clusters|map('last')|product([node_group])|map('reverse')|map('join', '-')|join(' ') }}"
     node_group_name: "vagrant_{{ node_group }}"
 

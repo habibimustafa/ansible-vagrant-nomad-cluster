@@ -7,7 +7,6 @@
 
   vars:
     node_group: "consul"
-    node_clusters: "{{ consul_clusters }}"
 
   vars_files:
     - vars/variables.prod.yml
