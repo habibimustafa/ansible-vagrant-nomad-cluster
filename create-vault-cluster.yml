@@ -1,0 +1,54 @@
+### VAULT
+# create nodes
+- hosts: local
+  become: true
+  become_user: "{{ act_as }}"
+
+  vars:
+    node_group: "vault"
+
+  vars_files:
+    - vars/variables.prod.yml
+
+  roles:
+    - vagrant-newnode
+
+# wait node ready
+- hosts: vagrant_vault
+  become: true
+  gather_facts: no
+
+  roles:
+    - node-wait
+
+# provision
+- hosts: vagrant_vault
+  become: true
+
+  vars:
+    vault_server: true
+
+  roles:
+    - basic
+    - consul-install
+    - vault-install
+
+# starting vault
+- hosts: vagrant_vault
+  become: true
+  serial: true
+
+  tasks:
+    - name: Restart vault service
+      systemd:
+        name: vault
+        state: restarted
+        enabled: true
+        daemon_reload: yes
+
+# bootstrap acl
+#- hosts: vault-1
+#  become: true
+#
+#  roles:
+#    - vault-bootstrap
