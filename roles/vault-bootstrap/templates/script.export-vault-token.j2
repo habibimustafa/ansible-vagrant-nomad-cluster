@@ -1,0 +1,3 @@
+#/bin/bash
+
+echo "export VAULT_TOKEN=\"{{ (vault_tokens.stdout|from_json).root_token }}\"" >> ~/.bashrc

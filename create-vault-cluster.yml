@@ -46,9 +46,9 @@
         enabled: true
         daemon_reload: yes
 
-# bootstrap acl
-#- hosts: vault-1
-#  become: true
-#
-#  roles:
-#    - vault-bootstrap
+# bootstrap seal token
+- hosts: vault-1
+  become: true
+
+  roles:
+    - vault-bootstrap

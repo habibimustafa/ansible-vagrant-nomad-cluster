@@ -1,0 +1,42 @@
+- name: Initialize Vault Token
+  shell: vault operator init -format=json
+  environment:
+    VAULT_ADDR: "http://127.0.0.1:8200"
+  register: vault_tokens
+
+- name: Create vault directory
+  file:
+    path: "{{ vault_filepath }}"
+    state: directory
+    mode: 0755
+    owner: vagrant
+    group: vagrant
+
+- name: Copy Tokens to file
+  copy:
+    content: "{{ vault_tokens.stdout }}"
+    dest: "{{ vault_filepath }}/tokens.json"
+    mode: 0644
+    owner: vagrant
+    group: vagrant
+
+- name: Auto Unseal
+  shell: "vault operator unseal {{ item }}"
+  environment:
+    VAULT_ADDR: "http://127.0.0.1:8200"
+  loop: "{{ (vault_tokens.stdout|from_json).unseal_keys_b64[:3] }}"
+
+- name: Put vault token exporter
+  template:
+    src: script.export-vault-token.j2
+    dest: /usr/local/bin/export-vault-token
+    mode: 0755
+
+- name: Check vault status
+  shell: vault status
+  environment:
+    VAULT_ADDR: "http://127.0.0.1:8200"
+    VAULT_TOKEN: "{{ (vault_tokens.stdout|from_json).root_token }}"
+  register: vault_status
+
+- debug: var=vault_status.stdout
