@@ -9,14 +9,6 @@
     vault_tokens: "{{ hostvars['vault-1'].vault_tokens }}"
   when: ansible_hostname == play_hosts|first
 
-- name: Create vault directory
-  file:
-    path: "{{ vault_filepath }}"
-    state: directory
-    mode: 0755
-    owner: vagrant
-    group: vagrant
-
 - name: Copy Tokens to file
   copy:
     content: "{{ vault_tokens.stdout }}"
