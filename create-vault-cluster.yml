@@ -30,19 +30,6 @@
     - consul-install
     - vault-install
 
-# starting vault
-- hosts: vagrant_vault
-  become: true
-  serial: true
-
-  tasks:
-    - name: Restart vault service
-      systemd:
-        name: vault
-        state: restarted
-        enabled: true
-        daemon_reload: yes
-
 # bootstrap seal token
 - hosts: vault-1
   become: true

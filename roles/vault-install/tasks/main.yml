@@ -36,3 +36,10 @@
     owner: vault
     group: vault
     mode: 0600
+
+- name: Restart vault service
+  systemd:
+    name: vault
+    state: restarted
+    enabled: true
+    daemon_reload: yes
