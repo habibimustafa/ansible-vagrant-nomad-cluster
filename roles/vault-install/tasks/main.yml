@@ -36,4 +36,3 @@
     owner: vault
     group: vault
     mode: 0600
-  when: vault_server is defined and vault_server == true
