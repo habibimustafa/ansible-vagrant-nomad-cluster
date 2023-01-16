@@ -3,6 +3,11 @@
   environment:
     VAULT_ADDR: "http://127.0.0.1:8200"
   register: vault_tokens
+  when: ansible_hostname == play_hosts|first
+
+- set_fact:
+    vault_tokens: "{{ hostvars['vault-1'].vault_tokens }}"
+  when: ansible_hostname == play_hosts|first
 
 - name: Create vault directory
   file:
