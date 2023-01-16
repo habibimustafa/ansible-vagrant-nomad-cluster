@@ -31,8 +31,9 @@
     - vault-install
 
 # bootstrap seal token
-- hosts: vault-1
+- hosts: vagrant_vault
   become: true
+  serial: true
 
   roles:
     - vault-bootstrap
