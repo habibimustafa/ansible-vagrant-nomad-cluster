@@ -22,17 +22,8 @@
 - name: Put vault token exporter
   template:
     src: script.export-vault-token.j2
-    dest: /usr/local/bin/export-vault-token
+    dest: /etc/profile.d/export-vault-token.sh
     mode: 0755
-
-- name: Set vault token
-  shell: |
-    export-vault-token
-    source ~/.bashrc
-  become: true
-  become_user: vagrant
-  args:
-    executable: /bin/bash
 
 - name: Check vault status
   shell: vault status
