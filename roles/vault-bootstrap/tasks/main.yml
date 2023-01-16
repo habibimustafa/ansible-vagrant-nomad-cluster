@@ -29,11 +29,17 @@
     dest: /usr/local/bin/export-vault-token
     mode: 0755
 
+- name: Set vault token
+  shell: |
+    export-vault-token
+    source ~/.bashrc
+  become: true
+  become_user: vagrant
+
 - name: Check vault status
   shell: vault status
   environment:
     VAULT_ADDR: "http://127.0.0.1:8200"
-    VAULT_TOKEN: "{{ (vault_tokens.stdout|from_json).root_token }}"
   register: vault_status
 
 - debug: var=vault_status.stdout
