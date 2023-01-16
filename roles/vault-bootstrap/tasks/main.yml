@@ -31,6 +31,8 @@
     source ~/.bashrc
   become: true
   become_user: vagrant
+  args:
+    executable: /bin/bash
 
 - name: Check vault status
   shell: vault status

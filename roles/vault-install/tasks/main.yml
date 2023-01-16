@@ -35,6 +35,8 @@
     source ~/.bashrc
   become: true
   become_user: vagrant
+  args:
+    executable: /bin/bash
 
 - name: Set vault config to server mode
   template:
