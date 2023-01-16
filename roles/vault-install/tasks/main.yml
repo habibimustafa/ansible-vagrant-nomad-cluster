@@ -31,6 +31,3 @@
     group: vault
     mode: 0600
   when: vault_server is defined and vault_server == true
-
-- include_tasks: worker.yml
-  when: vault_server is undefined or vault_server != true
