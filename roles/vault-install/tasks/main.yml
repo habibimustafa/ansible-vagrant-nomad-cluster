@@ -29,6 +29,13 @@
     dest: /usr/local/bin/export-vault-addr
     mode: 0755
 
+- name: Set vault address
+  shell: |
+    export-vault-addr
+    source ~/.bashrc
+  become: true
+  become_user: vagrant
+
 - name: Set vault config to server mode
   template:
     src: conf.vault.server.j2

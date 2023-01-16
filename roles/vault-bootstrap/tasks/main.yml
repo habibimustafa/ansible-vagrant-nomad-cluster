@@ -1,7 +1,5 @@
 - name: Initialize Vault Token
   shell: vault operator init -format=json
-  environment:
-    VAULT_ADDR: "http://127.0.0.1:8200"
   register: vault_tokens
   when: ansible_hostname == play_hosts|first
 
@@ -19,8 +17,6 @@
 
 - name: Auto Unseal
   shell: "vault operator unseal {{ item }}"
-  environment:
-    VAULT_ADDR: "http://127.0.0.1:8200"
   loop: "{{ (vault_tokens.stdout|from_json).unseal_keys_b64[:3] }}"
 
 - name: Put vault token exporter
@@ -38,8 +34,6 @@
 
 - name: Check vault status
   shell: vault status
-  environment:
-    VAULT_ADDR: "http://127.0.0.1:8200"
   register: vault_status
 
 - debug: var=vault_status.stdout
