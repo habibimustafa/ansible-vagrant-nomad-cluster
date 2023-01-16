@@ -26,17 +26,8 @@
 - name: Put vault address exporter
   template:
     src: script.export-vault-addr.j2
-    dest: /usr/local/bin/export-vault-addr
+    dest: /etc/profile.d/export-vault-addr.sh
     mode: 0755
-
-- name: Set vault address
-  shell: |
-    export-vault-addr
-    source ~/.bashrc
-  become: true
-  become_user: vagrant
-  args:
-    executable: /bin/bash
 
 - name: Set vault config to server mode
   template:
