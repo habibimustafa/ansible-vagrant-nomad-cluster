@@ -15,7 +15,7 @@
 - name: Copy Tokens to file
   copy:
     content: "{{ vault_tokens.stdout }}"
-    dest: "{{ vault_filepath }}/tokens.json"
+    dest: /home/vagrant/vault_tokens.json
     mode: 0644
     owner: vagrant
     group: vagrant
