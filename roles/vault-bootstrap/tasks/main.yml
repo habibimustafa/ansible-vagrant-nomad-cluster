@@ -28,5 +28,7 @@
 - name: Check vault status
   shell: vault status
   register: vault_status
+  environment:
+    VAULT_TOKEN: "{{ (vault_tokens.stdout|from_json).root_token }}"
 
 - debug: var=vault_status.stdout
