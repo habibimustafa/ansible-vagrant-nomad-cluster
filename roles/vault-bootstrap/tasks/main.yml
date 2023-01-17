@@ -1,11 +1,15 @@
+- name: Get first play hostname
+  set_fact:
+    first_play_hostname: "{{ ansible_play_hosts|first }}"
+
 - name: Initialize Vault Token
   shell: vault operator init -format=json
   register: vault_tokens
-  when: ansible_hostname == play_hosts|first
+  when: ansible_hostname == first_play_hostname
 
 - set_fact:
-    vault_tokens: "{{ hostvars['vault-1'].vault_tokens }}"
-  when: ansible_hostname == play_hosts|first
+    vault_tokens: "{{ hostvars[first_play_hostname].vault_tokens }}"
+  when: ansible_hostname != first_play_hostname
 
 - name: Copy Tokens to file
   copy:
