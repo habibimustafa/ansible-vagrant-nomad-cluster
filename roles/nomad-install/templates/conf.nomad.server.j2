@@ -1,9 +1,9 @@
 # Full configuration options can be found at https://www.nomadproject.io/docs/configuration
 
-data_dir    = "/opt/nomad/data"
-bind_addr   = "0.0.0.0"
 datacenter  = "dc1"
 region      = "ap-southeast-1"
+data_dir    = "/opt/nomad/data"
+bind_addr   = "0.0.0.0"
 
 advertise {
   http = "{{ ansible_enp0s8['ipv4']['address'] }}"
