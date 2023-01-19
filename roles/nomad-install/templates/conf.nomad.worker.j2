@@ -66,3 +66,9 @@ plugin "docker" {
     allow_caps       = ["chown", "net_raw"]
   }
 }
+
+telemetry {
+  publish_allocation_metrics = true
+  publish_node_metrics       = true
+  prometheus_metrics         = true
+}
