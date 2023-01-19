@@ -30,6 +30,10 @@ consul {
   client_auto_join    = true
 }
 
+plugin "raw_exec" {
+  enabled = true
+}
+
 # https://developer.hashicorp.com/nomad/docs/drivers/docker#client-requirements
 
 plugin "docker" {
