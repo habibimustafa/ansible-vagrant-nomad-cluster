@@ -5,15 +5,25 @@ region      = "ap-southeast-1"
 data_dir    = "/opt/nomad/data"
 bind_addr   = "0.0.0.0"
 
+server {
+  enabled          = true
+  bootstrap_expect = 3
+
+  default_scheduler_config {
+    memory_oversubscription_enabled = true
+
+    preemption_config {
+      batch_scheduler_enabled   = true
+      system_scheduler_enabled  = true
+      service_scheduler_enabled = true
+    }
+  }
+}
+
 advertise {
   http = "{{ ansible_enp0s8['ipv4']['address'] }}"
   rpc  = "{{ ansible_enp0s8['ipv4']['address'] }}"
   serf = "{{ ansible_enp0s8['ipv4']['address'] }}"
-}
-
-server {
-  enabled          = true
-  bootstrap_expect = 3
 }
 
 acl {
