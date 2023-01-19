@@ -5,19 +5,18 @@ region      = "ap-southeast-1"
 data_dir    = "/opt/nomad/data"
 bind_addr   = "0.0.0.0"
 
-advertise {
-  http = "{{ ansible_enp0s8['ipv4']['address'] }}"
-  rpc  = "{{ ansible_enp0s8['ipv4']['address'] }}"
-  serf = "{{ ansible_enp0s8['ipv4']['address'] }}"
-}
-
-# Enable the client
 client {
   enabled = true
   options {
     "driver.raw_exec.enable"    = "1"
     "docker.privileged.enabled" = "true"
   }
+}
+
+advertise {
+  http = "{{ ansible_enp0s8['ipv4']['address'] }}"
+  rpc  = "{{ ansible_enp0s8['ipv4']['address'] }}"
+  serf = "{{ ansible_enp0s8['ipv4']['address'] }}"
 }
 
 acl {
