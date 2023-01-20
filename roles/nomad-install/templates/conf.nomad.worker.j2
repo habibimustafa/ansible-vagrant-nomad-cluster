@@ -7,6 +7,11 @@ bind_addr   = "0.0.0.0"
 
 client {
   enabled = true
+
+  # https://discuss.hashicorp.com/t/how-to-change-unique-network-ip-address-for-a-node/22696
+  # https://developer.hashicorp.com/nomad/docs/configuration/client#network_interface
+  network_interface = "enp0s8"
+
   options {
     "driver.raw_exec.enable"    = "1"
     "docker.privileged.enabled" = "true"
