@@ -1,18 +1,9 @@
 ---
-- name: add docker apt signing key
-  shell: |
-    mkdir -p /etc/apt/keyrings
-    curl -fsSL {{ docker_key }} | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+- name: Setup base packages
+  include_tasks: apt.yml
 
-- name: add docker repositories
-  apt_repository:
-    repo: "{{ docker_repo }}"
-    filename: nomad
-    state: present
-    update_cache: no
+- name: Creating docker user
+  include_tasks: user.yml
 
-- name: Installing docker packages
-  apt:
-    name: "{{ docker_packages }}"
-    state: present
-    update-cache: true
+- name: Setup docker rootless
+  include_tasks: rootless.yml

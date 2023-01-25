@@ -1,11 +1,24 @@
-docker_repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu bionic stable"
-docker_key: "https://download.docker.com/linux/ubuntu/gpg"
-docker_packages:
+apt_packages:
+  - acl
+  - apt-transport-https
   - ca-certificates
   - curl
+  - dbus-user-session
   - gnupg
+  - iptables
+  - libpam-systemd
   - lsb-release
-  - docker-ce
-  - docker-ce-cli
-  - containerd.io
-  - docker-compose-plugin
+  - python3-pexpect
+  - python3-pip
+  - python3-six
+  - uidmap
+
+docker_user: dckr
+docker_release: "20.10.23"
+docker_release_shasum: "0ee39f72cc434137d294c14d30897826bad6e24979e421f51a252769ad37e6d1"
+docker_release_rootless_shasum: "2b3ec9db6d4f8f9059b45f3c5a12fc4c2bc8c97a053bf6855c9f71f3a556097a"
+docker_bash_completion_shasum: "cd9c70120bc5f7e6772b6a5350abf63099004c357814abc8a8a3689a7f2e3df0"
+docker_url: "https://download.docker.com/linux/static/stable/x86_64"
+
+slirp4netns_version: "1.2.0"
+slirp4netns_url: https://github.com/rootless-containers/slirp4netns/releases/download

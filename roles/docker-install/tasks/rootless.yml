@@ -1,0 +1,112 @@
+- name: Create Docker user bin dir
+  become: true
+  become_user: "{{ docker_user }}"
+  file:
+    path: "{{ docker_user_info.home }}/bin"
+    state: directory
+    mode: 0700
+
+- name: Create Docker user systemd config dir
+  become: true
+  become_user: "{{ docker_user }}"
+  file:
+    path: "{{ docker_user_info.home }}/.config/systemd/user"
+    state: directory
+    mode: 0700
+
+- name: "Download Docker archive {{ docker_release }}"
+  become: true
+  become_user: "{{ docker_user }}"
+  get_url:
+    url: "{{ docker_url }}/docker-{{ docker_release }}.tgz"
+    dest: "{{ docker_user_info.home }}/docker-{{ docker_release }}.tgz"
+    checksum: "sha256:{{ docker_release_shasum }}"
+    owner: "{{ docker_user }}"
+    mode: 0644
+
+- name: Download docker-rootless-extras
+  become: true
+  become_user: "{{ docker_user }}"
+  get_url:
+    url: "{{ docker_url }}/docker-rootless-extras-{{ docker_release }}.tgz"
+    dest: "{{ docker_user_info.home }}/docker-rootless-extras-{{ docker_release }}.tgz"
+    checksum: "sha256:{{ docker_release_rootless_shasum }}"
+    owner: "{{ docker_user }}"
+    mode: 0644
+
+- name: Extract Docker archive into Docker user bin directory
+  become: true
+  become_user: "{{ docker_user }}"
+  unarchive:
+    src: "{{ docker_user_info.home }}/docker-{{ docker_release }}.tgz"
+    dest: "{{ docker_user_info.home }}/bin"
+    extra_opts:
+      - --strip-components=1
+    remote_src: true
+  notify:
+    - Restart rootless docker
+
+- name: Extract docker-rootless-extras into Docker user bin directory
+  become: true
+  become_user: "{{ docker_user }}"
+  unarchive:
+    src: "{{ docker_user_info.home }}/docker-rootless-extras-{{ docker_release }}.tgz"
+    dest: "{{ docker_user_info.home }}/bin"
+    extra_opts:
+      - --strip-components=1
+    remote_src: true
+
+- name: Add Docker systemd service
+  become: true
+  become_user: "{{ docker_user }}"
+  template:
+    src: docker_rootless.service.j2
+    dest: "{{ docker_user_info.home }}/.config/systemd/user/docker.service"
+    backup: true
+    mode: 0600
+
+- name: Enable and start Docker (rootless installation)
+  become: true
+  become_user: "{{ docker_user }}"
+  systemd:
+    name: docker.service
+    enabled: true
+    state: started
+    scope: user
+    daemon_reload: true
+
+- name: Add user sudo alias
+  vars:
+    sudo_alias: >
+      alias docker='sudo XDG_RUNTIME_DIR="/run/user/{{ docker_user_info.uid }}"
+      DOCKER_HOST="unix:///run/user/{{ docker_user_info.uid }}/docker.sock"
+      {{ docker_user_info.home }}/bin/docker'
+  block:
+    - name: Stat .bashrc
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+      register: user_bashrc
+
+    - name: Check if .bash_aliases is used
+      ansible.builtin.command: grep -q '.bash_aliases' "{{ ansible_env.HOME }}/.bashrc"
+      register: check_aliases
+      changed_when: check_aliases.rc >= 2
+      failed_when: check_aliases.rc >= 2
+      when: user_bashrc.stat.exists
+
+    - name: Add rootless Docker alias to .bash_aliases
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_env.HOME }}/.bash_aliases"
+        line: "{{ sudo_alias }}"
+        regexp: '^alias docker='
+        state: present
+        create: true
+        mode: 0640
+      when: check_aliases.rc == 0 and user_bashrc.stat.exists
+
+    - name: Add rootless Docker alias to .bashrc
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        line: "{{ sudo_alias }}"
+        regexp: '^alias docker='
+      when: user_bashrc.stat.exists and check_aliases.rc != 0

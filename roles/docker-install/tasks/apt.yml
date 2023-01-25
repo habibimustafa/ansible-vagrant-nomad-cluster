@@ -1,0 +1,31 @@
+---
+- name: Run apt update
+  become: true
+  apt:
+    update_cache: true
+    cache_valid_time: 1800
+
+- name: Install packages
+  become: true
+  apt:
+    name: "{{ apt_packages }}"
+    state: present
+    install_recommends: false
+
+- name: Install slirp4netns
+  become: true
+  shell: |
+    curl -o slirp4netns --fail -L {{ slirp4netns_url }}/v{{ slirp4netns_version }}/slirp4netns-$(uname -m)
+    chmod +x slirp4netns
+  args:
+    chdir: /usr/local/bin
+
+- name: Install fuse-overlayfs
+  become: true
+  apt:
+    name: fuse-overlayfs
+    state: present
+    install_recommends: false
+  when:
+    - ansible_kernel is version("4.18", ">=")
+    - ansible_kernel is version("5.11", "<=")
