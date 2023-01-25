@@ -110,3 +110,11 @@
         line: "{{ sudo_alias }}"
         regexp: '^alias docker='
       when: user_bashrc.stat.exists and check_aliases.rc != 0
+
+- name: Clean up docker archive and docker rootless extras file
+  file:
+    path: "item"
+    state: absent
+  with_items:
+    - "{{ docker_user_info.home }}/docker-{{ docker_release }}.tgz"
+    - "{{ docker_user_info.home }}/docker-rootless-extras-{{ docker_release }}.tgz"
