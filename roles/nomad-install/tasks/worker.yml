@@ -6,11 +6,21 @@
     group: nomad
     mode: 0600
 
+- name: Check is docker group exist
+  getent:
+    database: group
+    key: docker
+  register: is_docker_group_exist
+  ignore_errors: true
+
 - name: Add nomad user to docker group
   user:
     name: nomad
     groups: docker
     append: yes
+  when:
+    - not is_docker_group_exist.failed
+    - ansible_facts.getent_group|length > 0
 
 - name: Restart nomad service
   systemd:
