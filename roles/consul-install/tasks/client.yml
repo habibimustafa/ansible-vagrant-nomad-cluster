@@ -12,3 +12,37 @@
     state: restarted
     enabled: true
     daemon_reload: yes
+
+- name: Create resolve conf directory
+  file:
+    path: /etc/systemd/resolved.conf.d
+    mode: 0755
+    state: directory
+
+- name: Put consul resolver configuration
+  template:
+    src: conf.consul.resolver.j2
+    dest: /etc/systemd/resolved.conf.d/consul.conf
+    mode: 0644
+
+- name: Map resolve port to consul
+  shell: |
+    iptables --table nat --append OUTPUT --destination localhost --protocol udp --match udp --dport 53 --jump REDIRECT --to-ports 8600
+    iptables --table nat --append OUTPUT --destination localhost --protocol tcp --match tcp --dport 53 --jump REDIRECT --to-ports 8600
+
+- name: Restart systemd-resolved service
+  systemd:
+    name: systemd-resolved
+    state: restarted
+    enabled: true
+    daemon_reload: yes
+
+- name: Check consul resolve service is active
+  shell: host consul.service.consul
+  async: 10
+  poll: 2
+  register: resolver_check
+
+- fail:
+    msg: Consul resolver configuration is fail
+  when: 'consul.service.consul has address' not in resolver_check.stdout
