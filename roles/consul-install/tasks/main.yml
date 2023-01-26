@@ -40,19 +40,6 @@
     mode: 0600
   when: consul_server is defined and consul_server == true
 
-- name: Set consul config to client mode
-  template:
-    src: conf.consul.client.j2
-    dest: /etc/consul.d/consul.hcl
-    owner: consul
-    group: consul
-    mode: 0600
-  when: consul_server is undefined or consul_server != true
-
-- name: Restart consul service
-  systemd:
-    name: consul
-    state: restarted
-    enabled: true
-    daemon_reload: yes
+- name: Include client mode tasks
+  include_tasks: client.yml
   when: consul_server is undefined or consul_server != true

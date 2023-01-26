@@ -1,0 +1,14 @@
+- name: Set consul config to client mode
+  template:
+    src: conf.consul.client.j2
+    dest: /etc/consul.d/consul.hcl
+    owner: consul
+    group: consul
+    mode: 0600
+
+- name: Restart consul service
+  systemd:
+    name: consul
+    state: restarted
+    enabled: true
+    daemon_reload: yes
