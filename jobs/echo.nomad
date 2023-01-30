@@ -7,7 +7,6 @@ job "echo" {
 
     network {
       port "http" {
-        static = 8080
         to = 8080
       }
     }

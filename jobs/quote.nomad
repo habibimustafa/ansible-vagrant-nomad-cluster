@@ -7,7 +7,6 @@ job "quote" {
 
     network {
       port "http" {
-        static = 3000
         to = 8080
       }
     }
@@ -16,6 +15,13 @@ job "quote" {
       name = "quote"
       tags = [ "app" ]
       port = "http"
+
+      meta {
+        nomad_ingress_enabled = true
+        nomad_ingress_hostname = "quote"
+        nomad_ingress_path = "/"
+        nomad_ingress_port = "http"
+      }
 
       check {
         name = "alive"
