@@ -1,0 +1,15 @@
+---
+- name: Generate nomad gossip keyring
+  shell: nomad operator gossip keyring generate
+  register: gossip_key
+
+- set_fact:
+    nomad_gossip_key: gossip_key.stdout
+
+- name: Set nomad config to server mode
+  template:
+    src: conf.nomad.server.j2
+    dest: /etc/nomad.d/nomad.hcl
+    owner: nomad
+    group: nomad
+    mode: 0600

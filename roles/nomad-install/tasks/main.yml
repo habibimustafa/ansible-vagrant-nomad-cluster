@@ -23,13 +23,7 @@
     update-cache: true
   when: nomad_version is defined
 
-- name: Set nomad config to server mode
-  template:
-    src: conf.nomad.server.j2
-    dest: /etc/nomad.d/nomad.hcl
-    owner: nomad
-    group: nomad
-    mode: 0600
+- include_tasks: server.yml
   when: nomad_server is defined and nomad_server == true
 
 - include_tasks: worker.yml

@@ -6,7 +6,11 @@ data_dir    = "/opt/nomad/data"
 bind_addr   = "0.0.0.0"
 
 server {
-  enabled          = true
+  enabled = true
+
+  # encrypt gossip communication
+  encrypt = "{{ nomad_gossip_key }}"
+
   bootstrap_expect = 3
 
   default_scheduler_config {
