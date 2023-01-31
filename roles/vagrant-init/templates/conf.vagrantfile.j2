@@ -11,7 +11,7 @@ PUBLIC_KEY = "{{ public_key_path }}"
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/bionic64"
   config.vm.provider "virtualbox" do |vb|
-    vb.memory = "1024"
+    vb.memory = "{{ default_memory }}"
     vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
   end
 {% for cluster in lookup('dict', clusters) %}
@@ -28,8 +28,8 @@ Vagrant.configure("2") do |config|
       node.vm.network "private_network", ip: node_ip
 
       node.vm.provider "virtualbox" do |vb|
-{% if cluster.key == "worker" %}
-        vb.memory = "2048"
+{% if cluster.key == "worker" and worker_memory is defined %}
+        vb.memory = "{{ worker_memory }}"
 {% endif %}
         vb.name = box_hostname
       end
