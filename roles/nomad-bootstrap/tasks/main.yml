@@ -25,3 +25,8 @@
   register: nomad_status
 
 - debug: var=nomad_status.stdout
+
+- name: Export nomad token
+  shell: echo "export NOMAD_TOKEN=\"{{ nomad_token }}\"" >> ~/.bashrc
+  become: true
+  become_user: vagrant
