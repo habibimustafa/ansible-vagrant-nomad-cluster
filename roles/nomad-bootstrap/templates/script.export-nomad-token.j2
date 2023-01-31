@@ -1,3 +1,0 @@
-#/bin/bash
-
-echo 'export NOMAD_TOKEN="$(cat ~/.nomad/acl.json | cut -f12 -d ":" | cut -d "\"" -f2 | xargs)"' >> ~/.bashrc
