@@ -5,8 +5,8 @@ data_dir            = "/var/lib/consul"
 bind_addr           = "0.0.0.0"
 client_addr         = "0.0.0.0"
 advertise_addr      = "{{ ansible_enp0s8['ipv4']['address'] }}"
-bootstrap_expect    = 3
-retry_join          = [ "192.168.58.11", "192.168.58.12", "192.168.58.13" ]
+bootstrap_expect    = {{ clusters['consul']|length }}
+retry_join          = [ "{{ clusters['consul']|join("\", \"") }}" ]
 
 ui_config {
     enabled = true

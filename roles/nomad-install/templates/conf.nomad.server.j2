@@ -11,7 +11,7 @@ server {
   # encrypt gossip communication
   encrypt = "{{ nomad_gossip_key }}"
 
-  bootstrap_expect = 3
+  bootstrap_expect = {{ clusters['nomad']|length }}
 
   default_scheduler_config {
     memory_oversubscription_enabled = true

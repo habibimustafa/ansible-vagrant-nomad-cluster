@@ -29,6 +29,9 @@
   vars:
     consul_server: true
 
+  vars_files:
+    - vars/variables.prod.yml
+
   roles:
     - basic
     - consul-install
