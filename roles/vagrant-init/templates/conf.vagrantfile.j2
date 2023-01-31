@@ -28,6 +28,9 @@ Vagrant.configure("2") do |config|
       node.vm.network "private_network", ip: node_ip
 
       node.vm.provider "virtualbox" do |vb|
+{% if cluster.key == "worker" %}
+        vb.memory = "2048"
+{% endif %}
         vb.name = box_hostname
       end
 
