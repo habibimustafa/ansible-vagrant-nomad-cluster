@@ -27,6 +27,6 @@
 - debug: var=nomad_status.stdout
 
 - name: Export nomad token
-  shell: echo "export NOMAD_TOKEN=\"{{ nomad_token }}\"" >> ~/.bashrc
+  shell: echo 'export NOMAD_TOKEN="$(cat ~/.nomad/acl.json | cut -f12 -d ":" | cut -d "\"" -f2 | xargs)"' >> ~/.bashrc
   become: true
   become_user: vagrant
