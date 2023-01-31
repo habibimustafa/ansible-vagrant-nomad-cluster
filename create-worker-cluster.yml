@@ -25,6 +25,9 @@
 - hosts: vagrant_worker
   become: true
 
+  vars_files:
+    - vars/variables.prod.yml
+
   roles:
     - basic
     - docker-install
