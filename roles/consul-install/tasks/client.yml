@@ -47,4 +47,4 @@
 
 - fail:
     msg: Consul resolver configuration is fail
-  when: 'consul.service.consul has address' not in resolver_check.stdout
+  when: not 'consul.service.consul has address' in resolver_check.stdout
