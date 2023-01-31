@@ -1,6 +1,15 @@
+- name: Get first play hostname
+  set_fact:
+    first_play_hostname: "{{ ansible_play_hosts|first }}"
+
 - name: Initialize ACL
   shell: nomad acl bootstrap -json
   register: nomad_acl
+  when: ansible_hostname == first_play_hostname
+
+- set_fact:
+    nomad_acl: "{{ hostvars[first_play_hostname].nomad_acl }}"
+  when: ansible_hostname != first_play_hostname
 
 - name: Create acl directory
   file:

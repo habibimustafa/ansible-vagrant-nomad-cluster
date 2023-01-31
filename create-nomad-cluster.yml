@@ -50,8 +50,9 @@
         daemon_reload: yes
 
 # bootstrap acl
-- hosts: nomad-1
+- hosts: vagrant_nomad
   become: true
+  serial: true
 
   roles:
     - nomad-bootstrap
