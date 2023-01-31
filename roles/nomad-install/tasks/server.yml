@@ -1,10 +1,20 @@
 ---
+- name: Get first play hostname
+  set_fact:
+    first_play_hostname: "{{ ansible_play_hosts|first }}"
+
 - name: Generate nomad gossip keyring
   shell: nomad operator gossip keyring generate
   register: gossip_key
+  when: ansible_hostname == first_play_hostname
 
 - set_fact:
     nomad_gossip_key: "{{ gossip_key.stdout }}"
+  when: ansible_hostname == first_play_hostname
+
+- set_fact:
+    nomad_gossip_key: "{{ hostvars[first_play_hostname].nomad_gossip_key }}"
+  when: ansible_hostname != first_play_hostname
 
 - name: Set nomad config to server mode
   template:
