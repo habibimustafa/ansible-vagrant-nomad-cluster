@@ -4,7 +4,7 @@
   register: gossip_key
 
 - set_fact:
-    nomad_gossip_key: gossip_key.stdout
+    nomad_gossip_key: "{{ gossip_key.stdout }}"
 
 - name: Set nomad config to server mode
   template:
