@@ -43,3 +43,42 @@
 - name: Include client mode tasks
   include_tasks: client.yml
   when: consul_server is undefined or consul_server != true
+
+- name: Create resolve conf directory
+  file:
+    path: /etc/systemd/resolved.conf.d
+    mode: 0755
+    state: directory
+
+- name: Put consul resolver configuration
+  template:
+    src: conf.consul.resolver.j2
+    dest: /etc/systemd/resolved.conf.d/consul.conf
+    mode: 0644
+
+- name: Map resolve port to consul
+  shell: |
+    iptables --table nat --append OUTPUT --destination localhost --protocol udp --match udp --dport 53 --jump REDIRECT --to-ports 8600
+    iptables --table nat --append OUTPUT --destination localhost --protocol tcp --match tcp --dport 53 --jump REDIRECT --to-ports 8600
+    iptables-save > /etc/iptables/rules.v4
+    ip6tables-save > /etc/iptables/rules.v6
+
+- name: Restart systemd-resolved service
+  systemd:
+    name: systemd-resolved
+    state: restarted
+    enabled: true
+    daemon_reload: yes
+
+- name: Check consul resolve service is active
+  shell: host consul.service.consul
+  async: 10
+  poll: 2
+  register: resolver_check
+  when: consul_server is undefined or consul_server != true
+
+- fail:
+    msg: Consul resolver configuration is fail
+  when:
+    - consul_server is undefined or consul_server != true
+    - not 'consul.service.consul has address' in resolver_check.stdout
