@@ -6,4 +6,5 @@ basic_packages:
   - openssl
   - gcc
   - make
+  - jq
   - iptables-persistent
