@@ -28,9 +28,7 @@
 
   vars:
     consul_server: true
-
-  vars_files:
-    - vars/variables.prod.yml
+    consul_retry_join: "{{ groups['vagrant_consul'] | map('extract',hostvars,'ip_address') }}"
 
   roles:
     - basic

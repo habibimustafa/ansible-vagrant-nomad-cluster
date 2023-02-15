@@ -5,8 +5,8 @@ data_dir            = "/var/lib/consul"
 bind_addr           = "0.0.0.0"
 client_addr         = "0.0.0.0"
 advertise_addr      = "{{ ansible_enp0s8['ipv4']['address'] }}"
-bootstrap_expect    = {{ groups['vagrant_consul']|length }}
-retry_join          = [ "{{ groups['vagrant_consul']|map('extract',hostvars,'ip_address')|join("\", \"") }}" ]
+bootstrap_expect    = {{ consul_retry_join | length }}
+retry_join          = [ "{{ consul_retry_join | join("\", \"") }}" ]
 
 ui_config {
     enabled = true
