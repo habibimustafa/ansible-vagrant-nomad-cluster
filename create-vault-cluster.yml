@@ -25,6 +25,12 @@
 - hosts: vagrant_vault
   become: true
 
+  vars:
+    consul_retry_join: "{{ clusters['consul'] }}"
+
+  vars_files:
+    - vars/variables.prod.yml
+
   roles:
     - basic
     - consul-install

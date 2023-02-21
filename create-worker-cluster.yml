@@ -25,6 +25,9 @@
 - hosts: vagrant_worker
   become: true
 
+  vars:
+    consul_retry_join: "{{ clusters['consul'] }}"
+
   vars_files:
     - vars/variables.prod.yml
 

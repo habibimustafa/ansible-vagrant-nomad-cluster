@@ -27,6 +27,7 @@
 
   vars:
     nomad_server: true
+    consul_retry_join: "{{ clusters['consul'] }}"
 
   vars_files:
     - vars/variables.prod.yml
