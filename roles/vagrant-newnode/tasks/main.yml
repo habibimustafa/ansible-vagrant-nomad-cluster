@@ -11,14 +11,17 @@
   args:
     chdir: "{{ playbook_dir }}"
   ignore_errors: true
+  when: node_read_only | default(false) == false
 
 - name: "Bootstrapping node {{ node_hostnames }}"
   shell: "vagrant up {{ node_hostnames }}"
   args:
     chdir: "{{ playbook_dir }}"
   register: new_node_status
+  when: node_read_only | default(false) == false
 
 - debug: var=new_node_status['stdout_lines']
+  when: node_read_only | default(false) == false
 
 - name: "Put {{ node_hostnames }} to inventory host"
   add_host:
