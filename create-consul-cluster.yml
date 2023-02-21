@@ -28,7 +28,7 @@
 
   vars:
     consul_server: true
-    consul_retry_join: "{{ groups['vagrant_consul'] | map('extract',hostvars,'ip_address') }}"
+    consul_retry_join: "{{ groups['vagrant_consul'] | map('extract', hostvars, ['ansible_enp0s8', 'ipv4', 'address']) }}"
 
   roles:
     - basic
