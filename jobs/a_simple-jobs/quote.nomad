@@ -3,7 +3,14 @@ job "quote" {
   type = "service"
 
   group "app" {
-    count = 3
+    count = 5
+
+    update {
+      canary = 2
+      max_parallel = 2
+      auto_promote = true
+      auto_revert = true
+    }
 
     network {
       port "http" {
@@ -13,8 +20,12 @@ job "quote" {
 
     service {
       name = "quote"
-      tags = [ "app" ]
       port = "http"
+
+      tags = [
+        "app",
+        "urlprefix-/",
+      ] 
 
       meta {
         nomad_ingress_enabled = true
