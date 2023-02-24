@@ -93,10 +93,10 @@
       shell: |
         consul acl token create \
           -description "vault service token" \
-          -service-identity "vault"
+          -service-identity "vault:dc1"
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
-      register: vault_service_token
+      register: raw_vault_service_token
       when: ansible_hostname == first_host
 
     - name: Create consul DNS request policy
@@ -152,6 +152,7 @@
 
     - name: Save the agent tokens
       set_fact:
+        vault_service_token: "{{ raw_vault_service_token.stdout_lines[1]|split(' ')|last }}"
         raw_tokens:
           agents: "{{ raw_agent_tokens.results }}"
           vault_servers: "{{ raw_vault_server_tokens.results }}"
@@ -200,7 +201,7 @@
     - name: Put vault service token to vault conf
       lineinfile:
         path: /etc/vault.d/vault.hcl
-        insertafter: '^storage\\s*"consul"'
+        insertafter: "^storage\\s*\"consul\""
         line: '  token = "{{ vault_service_token }}"'
 
     - name: Restart vault service
