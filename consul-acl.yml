@@ -79,7 +79,7 @@
     - name: Create consul agent token for each consul clients
       shell: |
         consul acl token create \
-          -description "{{ item }} agent token" \
+          -description "{{ item }} - agent token" \
           -node-identity "{{ item }}:{{ consul_dcs.results[item_idx].stdout }}"
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
@@ -129,7 +129,7 @@
     - name: Create vault server token policy for each consul clients
       shell: |
         consul acl token create \
-          -description "{{ item }} vault server kv token" \
+          -description "{{ item }} - vault server token" \
           -role-name vault-server \
           -node-identity "{{ item }}:{{ consul_dcs.results[item_idx].stdout }}"
       environment:
