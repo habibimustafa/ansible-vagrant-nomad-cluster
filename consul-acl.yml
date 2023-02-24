@@ -1,0 +1,137 @@
+# read nodes
+- hosts: local
+  become: true
+  become_user: "{{ act_as }}"
+
+  vars:
+    node_group: "consul"
+    node_read_only: true
+
+  vars_files:
+    - vars/variables.prod.yml
+
+  roles:
+    - vagrant-newnode
+
+- hosts: local
+  become: true
+  become_user: "{{ act_as }}"
+
+  vars:
+    node_group: "vault"
+    node_read_only: true
+
+  vars_files:
+    - vars/variables.prod.yml
+
+  roles:
+    - vagrant-newnode
+
+- hosts: vagrant_consul
+  become: true
+
+  vars:
+    ansible_host_key_checking: false
+
+  tasks:
+    - name: Put Consul ACL block
+      blockinfile:
+        path: /etc/consul.d/consul.hcl
+        insertafter:
+        block: |2
+
+          acl {
+            enabled = true
+            default_policy = "allow"
+            enable_token_persistence = true
+          }
+
+    - name: Remove block marker
+      lineinfile:
+        path: /etc/consul.d/consul.hcl
+        state: absent
+        regexp: ^# .* MANAGED BLOCK$
+
+    - systemd:
+        state: restarted
+        name: consul
+
+    - set_fact:
+        first_host: "{{ ansible_play_hosts|first }}"
+
+    - shell: consul acl bootstrap | tee /home/vagrant/consul_acl.txt
+      register: consul_acl
+      when: ansible_hostname == first_host
+
+    - set_fact:
+        consul_token: "{{ hostvars[first_host].consul_acl.stdout_lines[1]|split(' ')|last }}"
+
+    - shell: consul members | grep {{ item }} | awk '{print $7}'
+      register: consul_dcs
+      when: ansible_hostname == first_host
+      loop: "{{ groups['vagrant_vault'] }}"
+
+    - debug: var=consul_dcs
+      when: ansible_hostname == first_host
+
+    - shell: |
+        consul acl token create \
+          -description "{{ item }} agent token" \
+          -node-identity "{{ item }}:{{ consul_dcs.results[item_idx].stdout }}"
+      environment:
+        CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+      register: consul_raw_acls
+      when: ansible_hostname == first_host
+      loop: "{{ groups['vagrant_vault'] }}"
+      loop_control:
+        index_var: item_idx
+
+- hosts: vagrant_vault
+  become: true
+
+  vars:
+    ansible_host_key_checking: false
+
+  tasks:
+    - set_fact: raw_acls="{{ hostvars[groups['vagrant_consul']|first].consul_raw_acls.results }}"
+    - set_fact: acl_index="{{ lookup('ansible.utils.index_of', raw_acls, 'eq', ansible_hostname, 'item') }}"
+    - set_fact: acl_token="{{ raw_acls[acl_index|int].stdout_lines[1]|split(' ')|last }}"
+
+    - name: Put ACL block
+      blockinfile:
+        path: /etc/consul.d/consul.hcl
+        insertafter:
+        block: |2
+
+          acl {
+            tokens {
+              agent = "{{ acl_token }}"
+            }
+          }
+
+    - name: Remove block marker
+      lineinfile:
+        path: /etc/consul.d/consul.hcl
+        state: absent
+        regexp: ^# .* MANAGED BLOCK$
+
+    - systemd:
+        state: restarted
+        name: consul
+
+- hosts: vagrant_consul
+  become: true
+
+  vars:
+    ansible_host_key_checking: false
+
+  tasks:
+    - name: Set default policy to deny
+      lineinfile:
+        path: /etc/consul.d/consul.hcl
+        regexp: "default_policy\\s*=\\s*\"allow\""
+        line: default_policy = "deny"
+
+    - systemd:
+        state: restarted
+        name: consul
