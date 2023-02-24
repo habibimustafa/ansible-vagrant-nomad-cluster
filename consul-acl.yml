@@ -52,29 +52,32 @@
         state: absent
         regexp: ^# .* MANAGED BLOCK$
 
-    - systemd:
+    - name: Restart consul service
+      systemd:
         state: restarted
         name: consul
 
-    - set_fact:
+    - name: Set whos the first host
+      set_fact:
         first_host: "{{ ansible_play_hosts|first }}"
 
-    - shell: consul acl bootstrap | tee /home/vagrant/consul_acl.txt
+    - name: Bootstraping consul ACL
+      shell: consul acl bootstrap | tee /home/vagrant/consul_acl.txt
       register: consul_acl
       when: ansible_hostname == first_host
 
-    - set_fact:
+    - name: Save the global token
+      set_fact:
         consul_token: "{{ hostvars[first_host].consul_acl.stdout_lines[1]|split(' ')|last }}"
 
-    - shell: consul members | grep {{ item }} | awk '{print $7}'
+    - name: Gathering data centers of each consul clients
+      shell: consul members | grep {{ item }} | awk '{print $7}'
       register: consul_dcs
       when: ansible_hostname == first_host
       loop: "{{ groups['vagrant_vault'] }}"
 
-    - debug: var=consul_dcs
-      when: ansible_hostname == first_host
-
-    - shell: |
+    - name: Create consul agent token for each consul clients
+      shell: |
         consul acl token create \
           -description "{{ item }} agent token" \
           -node-identity "{{ item }}:{{ consul_dcs.results[item_idx].stdout }}"
@@ -115,7 +118,8 @@
         state: absent
         regexp: ^# .* MANAGED BLOCK$
 
-    - systemd:
+    - name: Restart consul service
+      systemd:
         state: restarted
         name: consul
 
@@ -132,6 +136,7 @@
         regexp: "default_policy\\s*=\\s*\"allow\""
         line: default_policy = "deny"
 
-    - systemd:
+    - name: Restart consul service
+      systemd:
         state: restarted
         name: consul
