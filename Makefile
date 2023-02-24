@@ -20,7 +20,7 @@ vault-cluster:
 
 consul-upgrade:
 	export ANSIBLE_HOST_KEY_CHECKING=False && \
-	ansible-playbook -vv upgrade-consul.yml --ask-become-pass
+	ansible-playbook -vv consul-upgrade.yml --ask-become-pass
 
 test:
 	export ANSIBLE_HOST_KEY_CHECKING=False && \
