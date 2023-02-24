@@ -153,8 +153,8 @@
     - name: Save the agent tokens
       set_fact:
         raw_tokens:
-          agents: raw_agent_tokens.results
-          vault_servers: raw_vault_server_tokens.results
+          agents: "{{ raw_agent_tokens.results }}"
+          vault_servers: "{{ raw_vault_server_tokens.results }}"
       when: ansible_hostname == first_host
 
 - hosts: vagrant_vault
