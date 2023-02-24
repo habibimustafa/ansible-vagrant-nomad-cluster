@@ -89,6 +89,16 @@
       loop_control:
         index_var: item_idx
 
+    - name: Create vault service token for each consul clients
+      shell: |
+        consul acl token create \
+          -description "vault service token" \
+          -service-identity "vault"
+      environment:
+        CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+      register: vault_service_token
+      when: ansible_hostname == first_host
+
     - name: Create consul DNS request policy
       shell: |
         consul acl policy create -name "dns-requests" -rules - <<EOF
@@ -149,6 +159,7 @@
 
 - hosts: vagrant_vault
   become: true
+  serial: true
 
   vars:
     ansible_host_key_checking: false
@@ -183,6 +194,19 @@
       systemd:
         state: restarted
         name: consul
+
+    - set_fact: vault_service_token="{{ hostvars[groups['vagrant_consul']|first].vault_service_token }}"
+
+    - name: Put vault service token to vault conf
+      lineinfile:
+        path: /etc/vault.d/vault.hcl
+        insertafter: '^storage\\s*"consul"'
+        line: '  token = "{{ vault_service_token }}"'
+
+    - name: Restart vault service
+      systemd:
+        state: restarted
+        name: vault
 
 - hosts: vagrant_consul
   become: true
