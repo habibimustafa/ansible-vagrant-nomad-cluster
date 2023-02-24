@@ -80,7 +80,7 @@
           -node-identity "{{ item }}:{{ consul_dcs.results[item_idx].stdout }}"
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
-      register: consul_raw_acls
+      register: raw_agent_tokens
       when: ansible_hostname == first_host
       loop: "{{ groups['vagrant_vault'] }}"
       loop_control:
@@ -93,9 +93,9 @@
     ansible_host_key_checking: false
 
   tasks:
-    - set_fact: raw_acls="{{ hostvars[groups['vagrant_consul']|first].consul_raw_acls.results }}"
-    - set_fact: acl_index="{{ lookup('ansible.utils.index_of', raw_acls, 'eq', ansible_hostname, 'item') }}"
-    - set_fact: acl_token="{{ raw_acls[acl_index|int].stdout_lines[1]|split(' ')|last }}"
+    - set_fact: raw_agent_tokens="{{ hostvars[groups['vagrant_consul']|first].raw_raw_agent_tokens.results }}"
+    - set_fact: agent_index="{{ lookup('ansible.utils.index_of', raw_agent_tokens, 'eq', ansible_hostname, 'item') }}"
+    - set_fact: agent_token="{{ raw_agent_tokens[agent_index|int].stdout_lines[1]|split(' ')|last }}"
 
     - name: Put ACL block
       blockinfile:
@@ -105,7 +105,7 @@
 
           acl {
             tokens {
-              agent = "{{ acl_token }}"
+              agent = "{{ agent_token }}"
             }
           }
 
