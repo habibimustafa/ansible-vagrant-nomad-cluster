@@ -22,6 +22,14 @@ consul-upgrade:
 	export ANSIBLE_HOST_KEY_CHECKING=False && \
 	ansible-playbook -vv consul-upgrade.yml --ask-become-pass
 
+consul-encrypt:
+	export ANSIBLE_HOST_KEY_CHECKING=False && \
+	ansible-playbook -vv consul-encrypt.yml --ask-become-pass
+
+consul-acl:
+	export ANSIBLE_HOST_KEY_CHECKING=False && \
+	ansible-playbook -vv consul-acl.yml --ask-become-pass
+
 test:
 	export ANSIBLE_HOST_KEY_CHECKING=False && \
 	ansible-playbook -vv test.yml --ask-become-pass
