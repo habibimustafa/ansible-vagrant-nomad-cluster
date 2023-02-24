@@ -208,6 +208,9 @@
         state: restarted
         name: vault
 
+    - name: Check is vault service properly registered to consul
+      shell: consul catalog services | grep vault
+
 - hosts: vagrant_consul
   become: true
 
