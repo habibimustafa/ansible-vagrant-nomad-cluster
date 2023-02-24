@@ -102,7 +102,6 @@
         EOF
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
-      register: dns_requests_policy
       when: ansible_hostname == first_host
 
     - name: Create consul DNS requests token for each consul clients
@@ -114,6 +113,31 @@
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
       register: raw_dns_tokens
+      when: ansible_hostname == first_host
+      loop: "{{ groups['vagrant_vault'] }}"
+      loop_control:
+        index_var: item_idx
+
+    - name: Create consul kv-vault-server policy
+      shell: |
+        consul acl policy create -name "kv-vault-server" -rules - <<EOF
+        key_prefix "vault/" {
+          policy = "write"
+        }
+        EOF
+      environment:
+        CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+      when: ansible_hostname == first_host
+
+    - name: Create consul DNS requests token for each consul clients
+      shell: |
+        consul acl token create \
+          -description "{{ item }} vault server kv token" \
+          -policy-name kv-vault-server
+          -node-identity "{{ item }}:{{ consul_dcs.results[item_idx].stdout }}"
+      environment:
+        CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+      register: raw_kv_vault_tokens
       when: ansible_hostname == first_host
       loop: "{{ groups['vagrant_vault'] }}"
       loop_control:
@@ -133,6 +157,10 @@
     - set_fact: raw_dns_tokens="{{ hostvars[groups['vagrant_consul']|first].raw_dns_tokens.results }}"
     - set_fact: dns_index="{{ lookup('ansible.utils.index_of', raw_dns_tokens, 'eq', ansible_hostname, 'item') }}"
     - set_fact: dns_token="{{ raw_dns_tokens[dns_index|int].stdout_lines[1]|split(' ')|last }}"
+
+    - set_fact: raw_kv_vault_tokens="{{ hostvars[groups['vagrant_consul']|first].raw_kv_vault_tokens.results }}"
+    - set_fact: kv_vault_index="{{ lookup('ansible.utils.index_of', raw_kv_vault_tokens, 'eq', ansible_hostname, 'item') }}"
+    - set_fact: kv_vault_token="{{ raw_kv_vault_tokens[kv_vault_index|int].stdout_lines[1]|split(' ')|last }}"
 
     - name: Put ACL block
       blockinfile:
