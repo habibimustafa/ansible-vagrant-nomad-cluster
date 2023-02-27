@@ -144,6 +144,7 @@
       shell: |
         consul acl token create \
           -description "vault service token" \
+          -role-name vault-server \
           -service-identity "vault:dc1"
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
