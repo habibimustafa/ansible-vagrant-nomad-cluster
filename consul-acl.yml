@@ -106,9 +106,9 @@
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
       when: ansible_hostname == first_host
 
-    - name: Create consul kv-vault-server policy
+    - name: Create consul vault-kv-write policy
       shell: |
-        consul acl policy create -name "kv-vault-server" -rules - <<EOF
+        consul acl policy create -name "vault-kv-write" -rules - <<EOF
         key_prefix "vault/" {
           policy = "write"
         }
@@ -123,7 +123,7 @@
           -name "vault-server" \
           -description "role for vault server" \
           -policy-name dns-requests \
-          -policy-name kv-vault-server
+          -policy-name vault-kv-write
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
       when: ansible_hostname == first_host
