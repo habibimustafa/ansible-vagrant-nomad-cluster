@@ -199,6 +199,12 @@
 
     - set_fact: vault_service_token="{{ hostvars[groups['vagrant_consul']|first].vault_service_token }}"
 
+    - name: Remove existing vault service token
+      lineinfile:
+        path: /etc/vault.d/vault.hcl
+        regexp: '  token = ".*"'
+        state: absent
+
     - name: Put vault service token to vault conf
       lineinfile:
         path: /etc/vault.d/vault.hcl
