@@ -222,8 +222,8 @@
     - name: Set default policy to deny
       lineinfile:
         path: /etc/consul.d/consul.hcl
-        regexp: "(\\s*default_policy\\s*=\\s*)\"allow\""
-        line: '\1"deny"'
+        regexp: '  default_policy = "allow"'
+        line: '  default_policy = "deny"'
 
     - name: Restart consul service
       systemd:
