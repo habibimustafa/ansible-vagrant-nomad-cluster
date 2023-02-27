@@ -212,7 +212,7 @@
       lineinfile:
         path: /etc/vault.d/vault.hcl
         insertafter: "^storage\\s*\"consul\""
-        line: '  token = "{{ vault_service_token }}"'
+        line: '  token   = "{{ vault_service_token }}"'
 
     - name: Restart vault service
       systemd:
