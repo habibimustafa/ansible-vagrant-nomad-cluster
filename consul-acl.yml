@@ -205,7 +205,7 @@
     - name: Remove existing vault service token
       lineinfile:
         path: /etc/vault.d/vault.hcl
-        regexp: '  token = ".*"'
+        regexp: '^  token .*'
         state: absent
 
     - name: Put vault service token to vault conf
