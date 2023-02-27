@@ -7,4 +7,5 @@ basic_packages:
   - gcc
   - make
   - jq
+  - uuid
   - iptables-persistent
