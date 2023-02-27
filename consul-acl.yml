@@ -145,20 +145,21 @@
     - name: Create vault service token for each consul clients
       shell: |
         consul acl token create \
-          -description "vault service token" \
+          -description "vault service token for {{ item }}" \
           -role-name vault-server \
-          -service-identity "vault:dc1"
+          -service-identity "vault"
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
       register: raw_vault_service_token
       when: ansible_hostname == first_host
+      loop: "{{ groups['vagrant_vault'] }}"
 
     - name: Save the agent tokens
       set_fact:
-        vault_service_token: "{{ raw_vault_service_token.stdout_lines[1]|split(' ')|last }}"
         raw_tokens:
           agents: "{{ raw_agent_tokens.results }}"
           vault_servers: "{{ raw_vault_server_tokens.results }}"
+          vault_service: "{{ raw_vault_service_token.results }}"
       when: ansible_hostname == first_host
 
 - hosts: vagrant_vault
@@ -174,6 +175,8 @@
     - set_fact: agent_token="{{ raw_tokens.agents[agent_index|int].stdout_lines[1]|split(' ')|last }}"
     - set_fact: vault_server_index="{{ lookup('ansible.utils.index_of', raw_tokens.vault_servers, 'eq', ansible_hostname, 'item') }}"
     - set_fact: vault_server_token="{{ raw_tokens.vault_servers[vault_server_index|int].stdout_lines[1]|split(' ')|last }}"
+    - set_fact: vault_service_index="{{ lookup('ansible.utils.index_of', raw_tokens.vault_service, 'eq', ansible_hostname, 'item') }}"
+    - set_fact: vault_service_token="{{ raw_tokens.vault_service[vault_service_index|int].stdout_lines[1]|split(' ')|last }}"
 
     - name: Put ACL block
       blockinfile:
@@ -198,8 +201,6 @@
       systemd:
         state: restarted
         name: consul
-
-    - set_fact: vault_service_token="{{ hostvars[groups['vagrant_consul']|first].vault_service_token }}"
 
     - name: Remove existing vault service token
       lineinfile:
