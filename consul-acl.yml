@@ -72,6 +72,8 @@
 
     - name: Gathering data centers of each consul clients
       shell: consul members | grep {{ item }} | awk '{print $7}'
+      environment:
+        CONSUL_HTTP_TOKEN: "{{ consul_token }}"
       register: consul_dcs
       when: ansible_hostname == first_host
       loop: "{{ groups['vagrant_vault'] }}"
