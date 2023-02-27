@@ -117,22 +117,39 @@
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
       when: ansible_hostname == first_host
 
-    - name: Create consul vault-server role
+    - name: Create consul vault-session-write policy
       shell: |
-        consul acl role create \
-          -name "vault-server" \
-          -description "role for vault server" \
-          -policy-name dns-requests \
-          -policy-name vault-kv-write
+        consul acl policy create -name "{{ item }}-session-write" -rules - <<EOF
+        session_prefix "{{ item }}" {
+          policy = "write"
+        }
+        session_prefix "" {
+          policy = "read"
+        }
+        EOF
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
       when: ansible_hostname == first_host
+      loop: "{{ groups['vagrant_vault'] }}"
+
+    - name: Create consul vault-server role
+      shell: |
+        consul acl role create \
+          -name "vault-server-{{ item }}" \
+          -description "role for vault server" \
+          -policy-name dns-requests \
+          -policy-name vault-kv-write \
+          -policy-name {{ item }}-session-write
+      environment:
+        CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+      when: ansible_hostname == first_host
+      loop: "{{ groups['vagrant_vault'] }}"
 
     - name: Create vault server token policy for each consul clients
       shell: |
         consul acl token create \
           -description "{{ item }} - vault server token" \
-          -role-name vault-server \
+          -role-name "vault-server-{{ item }}" \
           -node-identity "{{ item }}:{{ consul_dcs.results[item_idx].stdout }}"
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
@@ -146,7 +163,7 @@
       shell: |
         consul acl token create \
           -description "vault service token for {{ item }}" \
-          -role-name vault-server \
+          -role-name "vault-server-{{ item }}" \
           -service-identity "vault"
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
