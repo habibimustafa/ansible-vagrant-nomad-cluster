@@ -89,16 +89,6 @@
       loop_control:
         index_var: item_idx
 
-    - name: Create vault service token for each consul clients
-      shell: |
-        consul acl token create \
-          -description "vault service token" \
-          -service-identity "vault:dc1"
-      environment:
-        CONSUL_HTTP_TOKEN: "{{ consul_token }}"
-      register: raw_vault_service_token
-      when: ansible_hostname == first_host
-
     - name: Create consul DNS request policy
       shell: |
         consul acl policy create -name "dns-requests" -rules - <<EOF
@@ -149,6 +139,16 @@
       loop: "{{ groups['vagrant_vault'] }}"
       loop_control:
         index_var: item_idx
+
+    - name: Create vault service token for each consul clients
+      shell: |
+        consul acl token create \
+          -description "vault service token" \
+          -service-identity "vault:dc1"
+      environment:
+        CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+      register: raw_vault_service_token
+      when: ansible_hostname == first_host
 
     - name: Save the agent tokens
       set_fact:
