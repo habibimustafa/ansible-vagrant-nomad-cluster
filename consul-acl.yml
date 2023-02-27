@@ -192,6 +192,37 @@
           vault_service: "{{ raw_vault_service_token.results }}"
       when: ansible_hostname == first_host
 
+    - name: Gathering server data centers
+      shell: consul members | grep {{ ansible_hostname }} | awk '{print $7}'
+      environment:
+        CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+      register: datacenter
+
+    - name: Create consul agent token for each consul clients
+      shell: |
+        consul acl token create \
+          -description "{{ ansible_hostname }} - agent token" \
+          -policy-name dns-requests \
+          -node-identity "{{ ansible_hostname }}:{{ datacenter.stdout }}"
+      environment:
+        CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+      register: server_token
+
+    - name: Put token block
+      blockinfile:
+        path: /etc/consul.d/consul.hcl
+        insertafter: "^\\s*enable_token_persistence.*"
+        block: |2
+
+            tokens {
+              default = "{{ server_token.stdout_lines[1]|split(' ')|last }}"
+            }
+
+    - name: Restart consul service
+      systemd:
+        state: restarted
+        name: consul
+
 - hosts: vagrant_vault
   become: true
   serial: true
