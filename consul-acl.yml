@@ -34,6 +34,19 @@
     ansible_host_key_checking: false
 
   tasks:
+    - name: Put reset ACL script
+      copy:
+        content: |
+          #/bin/env bash
+  
+           export CONSUL_HTTP_TOKEN=$(cat /home/vagrant/consul_acl.txt | grep SecretID | awk '{print $2}')
+           export CONSUL_ROOT_ACCESSOR=$(cat /home/vagrant/consul_acl.txt | grep  AccessorID | awk '{print $2}')
+           while [[ $(consul acl token list | grep AccessorID | grep -Ev "000000|${CONSUL_ROOT_ACCESSOR}" | awk '{print $2}' | wc -l) > 0 ]]; do consul acl token delete -id $(consul acl token list | grep AccessorID | grep -Ev "000000|${CONSUL_ROOT_ACCESSOR}" | awk '{print $2}' | head -n1); done
+           while [[ $(consul acl policy list | grep -Ev '^ |global|^[[:blank:]]*$' | sed 's/:$//' | wc -l) > 0 ]]; do consul acl policy delete -name $(consul acl policy list | grep -Ev '^ |global|^[[:blank:]]*$' | sed 's/:$//' | head -n1); done
+           while [[ $(consul acl role list | grep -Ev '^ |^[[:blank:]]*$' | sed 's/:$//' | wc -l) > 0 ]]; do consul acl role delete -name $(consul acl role list | grep -Ev '^ |^[[:blank:]]*$' | sed 's/:$//' | head -n1); done
+        dest: /usr/local/bin/reset-consul-acl
+        mode: 0755
+
     - name: Put Consul ACL block
       blockinfile:
         path: /etc/consul.d/consul.hcl
