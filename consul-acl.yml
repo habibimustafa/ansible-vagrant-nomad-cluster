@@ -186,10 +186,26 @@
 
     - name: Save the agent tokens
       set_fact:
-        raw_tokens:
-          agents: "{{ raw_agent_tokens.results }}"
-          vault_servers: "{{ raw_vault_server_tokens.results }}"
-          vault_service: "{{ raw_vault_service_token.results }}"
+        agent_tokens: "{{ agent_tokens | default({}) | combine({ r.item : r.stdout_lines[1]|split(' ')|last }) }}"
+      loop: "{{ raw_agent_tokens.results }}"
+      loop_control:
+        loop_var: r
+      when: ansible_hostname == first_host
+
+    - name: Save the vault server tokens
+      set_fact:
+        vault_server_tokens: "{{ vault_server_tokens | default({}) | combine({ r.item : r.stdout_lines[1]|split(' ')|last }) }}"
+      loop: "{{ vault_server_tokens.results }}"
+      loop_control:
+        loop_var: r
+      when: ansible_hostname == first_host
+
+    - name: Save the vault service token
+      set_fact:
+        vault_service_tokens: "{{ vault_service_tokens | default({}) | combine({ r.item : r.stdout_lines[1]|split(' ')|last }) }}"
+      loop: "{{ vault_service_tokens.results }}"
+      loop_control:
+        loop_var: r
       when: ansible_hostname == first_host
 
     - name: Gathering server data centers
@@ -240,13 +256,9 @@
         dest: /usr/local/bin/vault-unseal
         mode: 0755
 
-    - set_fact: raw_tokens="{{ hostvars[groups['vagrant_consul']|first].raw_tokens }}"
-    - set_fact: agent_index="{{ lookup('ansible.utils.index_of', raw_tokens.agents, 'eq', ansible_hostname, 'item') }}"
-    - set_fact: agent_token="{{ raw_tokens.agents[agent_index|int].stdout_lines[1]|split(' ')|last }}"
-    - set_fact: vault_server_index="{{ lookup('ansible.utils.index_of', raw_tokens.vault_servers, 'eq', ansible_hostname, 'item') }}"
-    - set_fact: vault_server_token="{{ raw_tokens.vault_servers[vault_server_index|int].stdout_lines[1]|split(' ')|last }}"
-    - set_fact: vault_service_index="{{ lookup('ansible.utils.index_of', raw_tokens.vault_service, 'eq', ansible_hostname, 'item') }}"
-    - set_fact: vault_service_token="{{ raw_tokens.vault_service[vault_service_index|int].stdout_lines[1]|split(' ')|last }}"
+    - set_fact: agent_token="{{ hostvars[groups['vagrant_consul']|first].agent_tokens[ansible_hostname] }}"
+    - set_fact: vault_server_token="{{ hostvars[groups['vagrant_consul']|first].vault_server_tokens[ansible_hostname] }}"
+    - set_fact: vault_service_token="{{ hostvars[groups['vagrant_consul']|first].vault_service_tokens[ansible_hostname] }}"
 
     - name: Put ACL block
       blockinfile:
