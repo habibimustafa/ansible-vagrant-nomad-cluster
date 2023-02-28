@@ -293,7 +293,7 @@
     - name: Put vault service token to vault conf
       lineinfile:
         path: /etc/vault.d/vault.hcl
-        insertafter: "^storage\\s*\"consul\""
+        insertafter: "^\\s*path\\s*=\\s*\"vault/\""
         line: '  token   = "{{ vault_service_token }}"'
 
     - name: Restart vault service
