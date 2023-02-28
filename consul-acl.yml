@@ -180,7 +180,7 @@
           -service-identity "vault"
       environment:
         CONSUL_HTTP_TOKEN: "{{ consul_token }}"
-      register: raw_vault_service_token
+      register: raw_vault_service_tokens
       when: ansible_hostname == first_host
       loop: "{{ groups['vagrant_vault'] }}"
 
@@ -195,7 +195,7 @@
     - name: Save the vault server tokens
       set_fact:
         vault_server_tokens: "{{ vault_server_tokens | default({}) | combine({ r.item : r.stdout_lines[1]|split(' ')|last }) }}"
-      loop: "{{ vault_server_tokens.results }}"
+      loop: "{{ raw_vault_server_tokens.results }}"
       loop_control:
         loop_var: r
       when: ansible_hostname == first_host
@@ -203,7 +203,7 @@
     - name: Save the vault service token
       set_fact:
         vault_service_tokens: "{{ vault_service_tokens | default({}) | combine({ r.item : r.stdout_lines[1]|split(' ')|last }) }}"
-      loop: "{{ vault_service_tokens.results }}"
+      loop: "{{ raw_vault_service_tokens.results }}"
       loop_control:
         loop_var: r
       when: ansible_hostname == first_host
