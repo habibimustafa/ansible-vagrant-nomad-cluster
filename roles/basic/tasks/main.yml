@@ -3,12 +3,6 @@
   timezone:
     name: "{{ timezone }}"
 
-- name: Installing basics packages
-  apt:
-    name: "{{ basic_packages }}"
-    state: present
-    update-cache: true
-
 - name: is hashicorp list exist
   stat:
     path: /etc/apt/sources.list.d/hashicorp.list
@@ -31,3 +25,9 @@
     echo "deb [signed-by=$key_path] $repo $lsb main" | tee $src_path > /dev/null
     apt update
   when: not hashi_repo.stat.exists
+
+- name: Installing basics packages
+  apt:
+    name: "{{ basic_packages }}"
+    state: present
+    update-cache: true
