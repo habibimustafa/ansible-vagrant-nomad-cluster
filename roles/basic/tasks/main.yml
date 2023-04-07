@@ -8,3 +8,24 @@
     name: "{{ basic_packages }}"
     state: present
     update-cache: true
+
+- name: is hashicorp list exist
+  stat:
+    path: /etc/apt/sources.list.d/hashicorp.list
+  register: hashicorp_repo
+
+- name: create hashicorp list file
+  file:
+    path: /etc/apt/sources.list.d/hashicorp.list
+    state: touch
+    mode: 0644
+  when: not hashicorp_repo.stat.exists
+
+- name: put hashicorp gpg key and repo
+  shell: |
+    key_path=/usr/share/keyrings/hashicorp.gpg
+    src_path=/etc/apt/sources.list.d/hashicorp.list
+    wget -O- {{ hashicorp_repo }}/gpg | gpg --dearmor | tee $key_path > /dev/null
+    echo "deb [signed-by=$key_path] {{ hashicorp_repo }} $(lsb_release -cs) main" | tee $src_path > /dev/null
+    apt update
+  when: not hashicorp_repo.stat.exists

@@ -9,3 +9,5 @@ basic_packages:
   - jq
   - uuid
   - iptables-persistent
+
+hashicorp_repo: "https://apt.releases.hashicorp.com"
