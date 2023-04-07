@@ -1,14 +1,4 @@
 ---
-- name: add hashicorp apt signing key
-  shell: "curl -fsSL {{ hashi_key }} | apt-key add -"
-
-- name: add consul repositories
-  apt_repository:
-    repo: "{{ hashi_repo }}"
-    filename: nomad
-    state: present
-    update_cache: no
-
 - name: Installing latest consul version
   apt:
     name: consul

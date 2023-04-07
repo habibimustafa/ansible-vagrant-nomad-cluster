@@ -1,14 +1,4 @@
 ---
-- name: add hashicorp apt signing key
-  shell: "curl -fsSL {{ hashi_key }} | apt-key add -"
-
-- name: add vault repositories
-  apt_repository:
-    repo: "{{ hashi_repo }}"
-    filename: vault
-    state: present
-    update_cache: no
-
 - name: Installing latest vault version
   apt:
     name: vault
