@@ -1,2 +1,2 @@
-hashi_repo: "deb [arch=amd64] https://apt.releases.hashicorp.com bionic main"
+hashi_repo: "deb [arch=amd64] https://apt.releases.hashicorp.com focal main"
 hashi_key: "https://apt.releases.hashicorp.com/gpg"
