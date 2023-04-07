@@ -36,6 +36,6 @@
 - debug: var=nomad_status.stdout_lines
 
 - name: Export nomad token
-  shell: echo 'export NOMAD_TOKEN="$(cat ~/.nomad/acl.json | cut -f12 -d ":" | cut -d "\"" -f2 | xargs)"' >> ~/.bashrc
+  shell: echo 'export NOMAD_TOKEN="$(cat .nomad/acl.json | jq .SecretID | xargs)"' >> ~/.bashrc
   become: true
   become_user: vagrant
