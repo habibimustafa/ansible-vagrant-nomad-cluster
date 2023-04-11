@@ -34,17 +34,18 @@ acl {
   enabled = true
 }
 
-# tls {
-  # http = true
-  # rpc  = true
+tls {
+  http = true
+  rpc  = true
 
-  # ca_file   = "/etc/certs/ca.crt"
-  # cert_file = "/etc/certs/nomad.crt"
-  # key_file  = "/etc/certs/nomad.key"
+  ca_file   = "/opt/nomad/agent-certs/ca.crt"
+  cert_file = "/opt/nomad/agent-certs/agent.crt"
+  key_file  = "/opt/nomad/agent-certs/agent.key"
 
-  # verify_server_hostname = true
-  # verify_https_client = true
-#}
+  verify_server_hostname = true
+  verify_https_client = true
+  rpc_upgrade_mode = true
+}
 
 consul {
   address             = "127.0.0.1:8500"
