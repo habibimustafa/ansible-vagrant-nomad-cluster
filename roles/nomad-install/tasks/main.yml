@@ -31,7 +31,7 @@
     dest: /opt/nomad/templates/{{ item.filename }}
     owner: nomad
     group: nomad
-    mode: 0600
+    mode: 0644
   with_items:
     - { tpl: conf.consul-template.j2, filename: consul-template.hcl }
     - { tpl: cert.cli.crt.j2, filename: cli.crt.tpl }
