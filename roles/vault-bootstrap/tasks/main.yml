@@ -23,6 +23,12 @@
   shell: "vault operator unseal {{ item }}"
   loop: "{{ (vault_tokens.stdout|from_json).unseal_keys_b64[:3] }}"
 
+- name: Put vault auto unseal script
+  template:
+    src: script.vault-auto-unseal.j2
+    dest: /usr/local/bin/vault-auto-unseal
+    mode: 0755
+
 - name: Put vault token exporter
   template:
     src: script.export-vault-token.j2

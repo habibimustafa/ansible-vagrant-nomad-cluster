@@ -1,0 +1,10 @@
+#/bin/env bash
+
+TOKEN_PATH={{ vault_token_path }}
+
+IEND=$[ ( $RANDOM % ( $[ 4 - 2 ] + 1 ) ) + 2 ]
+ISTART=$[($IEND - (2))]
+
+for i in $(seq $ISTART $IEND); do
+  vault operator unseal $(cat ${TOKEN_PATH} | jq -r .unseal_keys_b64[$i]);
+done
