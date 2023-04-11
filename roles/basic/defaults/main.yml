@@ -16,5 +16,6 @@ basic_packages:
   - python3-apt
   - python3-pip
   - python-apt
+  - consul-template
 
 hashicorp_repo: "https://apt.releases.hashicorp.com"
