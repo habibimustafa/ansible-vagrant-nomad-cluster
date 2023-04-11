@@ -37,6 +37,14 @@
     - { tpl: cert.cli.crt.j2, filename: cli.crt.tpl }
     - { tpl: cert.cli.key.j2, filename: cli.key.tpl }
 
+- name: Put consul template service
+  template:
+    src: service.consul-template.j2
+    dest: /usr/lib/systemd/system/consul-template.service
+    owner: nomad
+    group: nomad
+    mode: 0644
+
 - include_tasks: server.yml
   when: nomad_server is defined and nomad_server == true
 

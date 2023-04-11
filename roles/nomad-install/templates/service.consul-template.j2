@@ -1,0 +1,19 @@
+[Unit]
+Description="Consul Template - Nomad mTLS Certificate Generator"
+Documentation=https://developer.hashicorp.com/nomad/tutorials/integrate-vault/vault-pki-nomad
+Requires=network-online.target
+After=network-online.target
+ConditionFileNotEmpty=/opt/nomad/templates/consul-template.hcl
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/bin/consul-template -config /opt/nomad/templates/consul-template.hcl
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+KillSignal=SIGINT
+Restart=on-failure
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
