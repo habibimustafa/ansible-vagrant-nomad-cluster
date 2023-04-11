@@ -25,6 +25,17 @@
     - cli-certs
     - templates
 
+- name: Put cli certificate template
+  template:
+    src: cert.{{ item }}.j2
+    dest: /opt/nomad/templates/{{ item }}.tpl
+    owner: nomad
+    group: nomad
+    mode: 0600
+  with_items:
+    - cli.crt
+    - cli.key
+
 - include_tasks: server.yml
   when: nomad_server is defined and nomad_server == true
 
