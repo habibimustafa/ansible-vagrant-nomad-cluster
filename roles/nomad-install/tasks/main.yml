@@ -25,16 +25,17 @@
     - cli-certs
     - templates
 
-- name: Put cli certificate template
+- name: Put consul template files
   template:
-    src: cert.{{ item }}.j2
-    dest: /opt/nomad/templates/{{ item }}.tpl
+    src: "{{ item.tpl }}"
+    dest: /opt/nomad/templates/{{ item.filename }}
     owner: nomad
     group: nomad
     mode: 0600
   with_items:
-    - cli.crt
-    - cli.key
+    - { tpl: conf.consul-template.j2, filename: consul-template.hcl }
+    - { tpl: cert.cli.crt.j2, filename: cli.crt.tpl }
+    - { tpl: cert.cli.key.j2, filename: cli.key.tpl }
 
 - include_tasks: server.yml
   when: nomad_server is defined and nomad_server == true
