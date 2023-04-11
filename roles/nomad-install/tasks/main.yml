@@ -13,6 +13,18 @@
     update-cache: true
   when: nomad_version is defined
 
+- name: Create consul template directories
+  file:
+    path: "/opt/nomad/{{ item }}"
+    state: directory
+    mode: 0755
+    owner: nomad
+    group: nomad
+  with_items:
+    - agent-certs
+    - cli-certs
+    - templates
+
 - include_tasks: server.yml
   when: nomad_server is defined and nomad_server == true
 
