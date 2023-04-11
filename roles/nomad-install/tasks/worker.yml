@@ -1,3 +1,15 @@
+- name: Put cli certificate template
+  template:
+    src: cert.{{ item.tpl }}.j2
+    dest: /opt/nomad/templates/{{ item.filename }}.tpl
+    owner: nomad
+    group: nomad
+    mode: 0600
+  with_items:
+    - { tpl: ca.crt, filename: ca.crt }
+    - { tpl: worker.crt, filename: agent.crt }
+    - { tpl: worker.key, filename: agent.key }
+
 - name: Set nomad config to client mode
   template:
     src: conf.nomad.worker.j2
