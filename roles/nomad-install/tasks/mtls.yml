@@ -69,3 +69,12 @@
     path: /opt/nomad/agent-certs/agent.crt
     state: present
     timeout: "{{ sleep_in_between|default(30) }}"
+
+- name: Export nomad tls environment variables
+  shell: |
+    echo 'export NOMAD_ADDR="https://127.0.0.1:4646"' >> ~/.bashrc
+    echo 'export NOMAD_CACERT="/opt/nomad/agent-certs/ca.crt"' >> ~/.bashrc
+    echo 'export NOMAD_CLIENT_CERT="/opt/nomad/cli-certs/cli.crt"' >> ~/.bashrc
+    echo 'export NOMAD_CLIENT_KEY="/opt/nomad/cli-certs/cli.key"' >> ~/.bashrc
+  become: true
+  become_user: vagrant
