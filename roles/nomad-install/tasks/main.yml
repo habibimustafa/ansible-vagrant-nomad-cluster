@@ -13,37 +13,7 @@
     update-cache: true
   when: nomad_version is defined
 
-- name: Create consul template directories
-  file:
-    path: "/opt/nomad/{{ item }}"
-    state: directory
-    mode: 0755
-    owner: nomad
-    group: nomad
-  with_items:
-    - agent-certs
-    - cli-certs
-    - templates
-
-- name: Put consul template files
-  template:
-    src: "{{ item.tpl }}"
-    dest: /opt/nomad/templates/{{ item.filename }}
-    owner: nomad
-    group: nomad
-    mode: 0644
-  with_items:
-    - { tpl: conf.consul-template.j2, filename: consul-template.hcl }
-    - { tpl: cert.cli.crt.j2, filename: cli.crt.tpl }
-    - { tpl: cert.cli.key.j2, filename: cli.key.tpl }
-
-- name: Put consul template service
-  template:
-    src: service.consul-template.j2
-    dest: /usr/lib/systemd/system/consul-template.service
-    owner: nomad
-    group: nomad
-    mode: 0644
+- include_tasks: mtls.yml
 
 - include_tasks: server.yml
   when: nomad_server is defined and nomad_server == true

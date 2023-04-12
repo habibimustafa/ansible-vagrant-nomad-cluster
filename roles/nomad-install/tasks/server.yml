@@ -1,16 +1,4 @@
 ---
-- name: Put cli certificate template
-  template:
-    src: cert.{{ item.tpl }}.j2
-    dest: /opt/nomad/templates/{{ item.filename }}.tpl
-    owner: nomad
-    group: nomad
-    mode: 0644
-  with_items:
-    - { tpl: ca.crt, filename: ca.crt }
-    - { tpl: server.crt, filename: agent.crt }
-    - { tpl: server.key, filename: agent.key }
-
 - name: Get first play hostname
   set_fact:
     first_play_hostname: "{{ ansible_play_hosts|first }}"
