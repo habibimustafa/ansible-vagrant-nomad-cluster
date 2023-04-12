@@ -55,5 +55,8 @@
   become: true
   serial: true
 
+  vars_files:
+    - vars/variables.prod.yml
+
   roles:
     - nomad-bootstrap
