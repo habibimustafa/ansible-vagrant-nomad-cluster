@@ -5,7 +5,21 @@
 - name: Initialize ACL
   shell: nomad acl bootstrap -json
   register: nomad_acl
-  when: ansible_hostname == first_play_hostname
+  when:
+    - ansible_hostname == first_play_hostname
+    - vault_mtls_token is undefined
+
+- name: Initialize ACL
+  shell: nomad acl bootstrap -json
+  register: nomad_acl
+  environment:
+    NOMAD_ADDR: https://127.0.0.1:4646
+    NOMAD_CACERT: /opt/nomad/agent-certs/ca.crt
+    NOMAD_CLIENT_CERT: /opt/nomad/cli-certs/cli.crt
+    NOMAD_CLIENT_KEY: /opt/nomad/cli-certs/cli.key
+  when:
+    - ansible_hostname == first_play_hostname
+    - vault_mtls_token is defined
 
 - set_fact:
     nomad_acl: "{{ hostvars[first_play_hostname].nomad_acl }}"
@@ -32,6 +46,18 @@
   environment:
     NOMAD_TOKEN: "{{ (nomad_acl.stdout|from_json).SecretID }}"
   register: nomad_status
+  when: vault_mtls_token is undefined
+
+- name: Check nomad status
+  shell: nomad status
+  environment:
+    NOMAD_TOKEN: "{{ (nomad_acl.stdout|from_json).SecretID }}"
+    NOMAD_ADDR: https://127.0.0.1:4646
+    NOMAD_CACERT: /opt/nomad/agent-certs/ca.crt
+    NOMAD_CLIENT_CERT: /opt/nomad/cli-certs/cli.crt
+    NOMAD_CLIENT_KEY: /opt/nomad/cli-certs/cli.key
+  register: nomad_status
+  when: vault_mtls_token is defined
 
 - debug: var=nomad_status.stdout_lines
 
