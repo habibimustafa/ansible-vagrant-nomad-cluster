@@ -34,6 +34,7 @@ acl {
   enabled = true
 }
 
+{% if vault_mtls_token is defined %}
 tls {
   http = true
   rpc  = true
@@ -47,6 +48,7 @@ tls {
   rpc_upgrade_mode = true
 }
 
+{% endif %}
 consul {
   address             = "127.0.0.1:8500"
   server_service_name = "nomad"

@@ -14,6 +14,7 @@
   when: nomad_version is defined
 
 - include_tasks: mtls.yml
+  when: vault_mtls_token is defined
 
 - include_tasks: server.yml
   when: nomad_server is defined and nomad_server == true
