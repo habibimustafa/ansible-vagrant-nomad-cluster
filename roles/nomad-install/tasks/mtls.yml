@@ -56,3 +56,10 @@
     - { tpl: worker.crt, filename: agent.crt }
     - { tpl: worker.key, filename: agent.key }
   when: nomad_server is undefined or nomad_server != true
+
+- name: Restart consul template service
+  systemd:
+    name: consul-template
+    state: restarted
+    enabled: true
+    daemon_reload: yes
