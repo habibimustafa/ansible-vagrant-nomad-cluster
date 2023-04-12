@@ -31,7 +31,7 @@
     group: nomad
     mode: 0644
 
-- name: Put cli certificate template
+- name: Put server agent certificate template
   template:
     src: cert.{{ item.tpl }}.j2
     dest: /opt/nomad/templates/{{ item.filename }}.tpl
@@ -44,7 +44,7 @@
     - { tpl: server.key, filename: agent.key }
   when: nomad_server is defined and nomad_server == true
 
-- name: Put cli certificate template
+- name: Put worker agent certificate template
   template:
     src: cert.{{ item.tpl }}.j2
     dest: /opt/nomad/templates/{{ item.filename }}.tpl
