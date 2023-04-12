@@ -1,4 +1,5 @@
 act_as: "someone"
+setup_nomad_tls: true
 vault_mtls_token: ""
 clusters:
   consul:
