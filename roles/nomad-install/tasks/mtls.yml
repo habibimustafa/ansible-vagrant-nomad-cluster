@@ -63,3 +63,9 @@
     state: restarted
     enabled: true
     daemon_reload: yes
+
+- name: Wait consul-template generate certificate
+  wait_for:
+    path: /opt/nomad/agent-certs/agent.crt
+    state: present
+    timeout: "{{ sleep_in_between|default(30) }}"
