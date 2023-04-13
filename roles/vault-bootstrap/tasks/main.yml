@@ -45,5 +45,6 @@
 
 - include_tasks: nomad-mtls.yml
   when:
+    - ansible_hostname == first_play_hostname
     - setup_nomad_tls is defined
     - setup_nomad_tls is true
