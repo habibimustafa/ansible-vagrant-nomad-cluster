@@ -66,12 +66,14 @@
 
 - name: Wait consul-template generate certificate
   wait_for:
-    path: /opt/nomad/agent-certs/agent.crt
+    path: /opt/nomad/cli-certs/cli.crt
     state: present
     timeout: "{{ sleep_in_between|default(30) }}"
 
 - name: Exporting cli cert to p12 keystore
-  shell: openssl pkcs12 -export -out keystore.p12 -inkey cli.key -in cli.crt
+  shell: |
+    openssl pkcs12 -export -out keystore.p12 \
+      -inkey cli.key -in cli.crt -passout pass:nomad
   args:
     chdir: /opt/nomad/cli-certs
 
