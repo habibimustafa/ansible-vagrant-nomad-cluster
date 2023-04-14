@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+ACL_FILEPATH=/home/vagrant/consul_acl.txt
+export CONSUL_HTTP_TOKEN=$(cat $ACL_FILEPATH | grep SecretID | awk '{print $2}')
+export CONSUL_ROOT_ACCESSOR=$(cat $ACL_FILEPATH | grep  AccessorID | awk '{print $2}')
+
+echo -e "Deleting all acl token"
+while [[ $(consul acl token list | grep AccessorID | grep -Ev "000000|${CONSUL_ROOT_ACCESSOR}" | awk '{print $2}' | wc -l) > 0 ]]; do consul acl token delete -id $(consul acl token list | grep AccessorID | grep -Ev "000000|${CONSUL_ROOT_ACCESSOR}" | awk '{print $2}' | head -n1); done
+
+echo -e "Deleting all acl policy"
+while [[ $(consul acl policy list | grep -Ev '^ |global|^[[:blank:]]*$' | sed 's/:$//' | wc -l) > 0 ]]; do consul acl policy delete -name $(consul acl policy list | grep -Ev '^ |global|^[[:blank:]]*$' | sed 's/:$//' | head -n1); done
+
+echo -e "Deleting all acl role"
+while [[ $(consul acl role list | grep -Ev '^ |^[[:blank:]]*$' | sed 's/:$//' | wc -l) > 0 ]]; do consul acl role delete -name $(consul acl role list | grep -Ev '^ |^[[:blank:]]*$' | sed 's/:$//' | head -n1); done
