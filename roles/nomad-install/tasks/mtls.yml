@@ -70,6 +70,11 @@
     state: present
     timeout: "{{ sleep_in_between|default(30) }}"
 
+- name: Exporting cli cert to p12 keystore
+  shell: openssl pkcs12 -export -out keystore.p12 -inkey cli.key -in cli.crt
+  args:
+    chdir: /opt/nomad/cli-certs
+
 - name: Export nomad tls environment variables
   shell: |
     echo 'export NOMAD_ADDR="https://127.0.0.1:4646"' >> ~/.bashrc
