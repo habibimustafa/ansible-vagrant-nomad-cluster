@@ -4,21 +4,11 @@
   become_user: "{{ act_as }}"
 
   vars:
-    node_group: "consul"
-    node_read_only: true
-
-  vars_files:
-    - vars/variables.prod.yml
-
-  roles:
-    - vagrant-newnode
-
-- hosts: local
-  become: true
-  become_user: "{{ act_as }}"
-
-  vars:
-    node_group: "vault"
+    node_groups:
+      - consul
+      - vault
+      - nomad
+      - worker
     node_read_only: true
 
   vars_files:

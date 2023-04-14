@@ -1,0 +1,9 @@
+---
+- include: newnode.yml
+  loop: "{{ node_groups }}"
+  loop_control:
+    loop_var: node_group
+  when: node_groups is defined
+
+- include: newnode.yml
+  when: node_group is defined
