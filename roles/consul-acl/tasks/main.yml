@@ -1,0 +1,205 @@
+---
+- name: Put reset ACL script
+  copy:
+    content: |
+      #/bin/env bash
+      
+       export CONSUL_HTTP_TOKEN=$(cat /home/vagrant/consul_acl.txt | grep SecretID | awk '{print $2}')
+       export CONSUL_ROOT_ACCESSOR=$(cat /home/vagrant/consul_acl.txt | grep  AccessorID | awk '{print $2}')
+       while [[ $(consul acl token list | grep AccessorID | grep -Ev "000000|${CONSUL_ROOT_ACCESSOR}" | awk '{print $2}' | wc -l) > 0 ]]; do consul acl token delete -accessor-id $(consul acl token list | grep AccessorID | grep -Ev "000000|${CONSUL_ROOT_ACCESSOR}" | awk '{print $2}' | head -n1); done
+       while [[ $(consul acl policy list | grep -Ev '^ |global|^[[:blank:]]*$' | sed 's/:$//' | wc -l) > 0 ]]; do consul acl policy delete -name $(consul acl policy list | grep -Ev '^ |global|^[[:blank:]]*$' | sed 's/:$//' | head -n1); done
+       while [[ $(consul acl role list | grep -Ev '^ |^[[:blank:]]*$' | sed 's/:$//' | wc -l) > 0 ]]; do consul acl role delete -name $(consul acl role list | grep -Ev '^ |^[[:blank:]]*$' | sed 's/:$//' | head -n1); done
+    dest: /usr/local/bin/reset-consul-acl
+    mode: 0755
+
+- name: Put Consul ACL block
+  blockinfile:
+    path: /etc/consul.d/consul.hcl
+    insertafter:
+    block: |2
+    
+      acl {
+        enabled = true
+        default_policy = "allow"
+        enable_token_persistence = true
+      }
+
+- name: Remove block marker
+  lineinfile:
+    path: /etc/consul.d/consul.hcl
+    state: absent
+    regexp: ^# .* MANAGED BLOCK$
+
+- name: Restart consul service
+  systemd:
+    state: restarted
+    name: consul
+
+- name: Set whos the first host
+  set_fact:
+    first_host: "{{ ansible_play_hosts|first }}"
+
+- name: Bootstraping consul ACL
+  shell: consul acl bootstrap | tee /home/vagrant/consul_acl.txt
+  register: consul_acl
+  when: ansible_hostname == first_host
+
+- name: Save the global token
+  set_fact:
+    consul_token: "{{ hostvars[first_host].consul_acl.stdout_lines[1]|split(' ')|last }}"
+
+- name: Gathering data centers of each consul clients
+  shell: consul members | grep {{ item }} | awk '{print $7}'
+  environment:
+    CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+  register: consul_dcs
+  when: ansible_hostname == first_host
+  loop: "{{ groups['vagrant_vault'] }}"
+
+- name: Create consul agent token for each consul clients
+  shell: |
+    consul acl token create \
+      -description "{{ item }} - agent token" \
+      -node-identity "{{ item }}:{{ consul_dcs.results[item_idx].stdout }}"
+  environment:
+    CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+  register: raw_agent_tokens
+  when: ansible_hostname == first_host
+  loop: "{{ groups['vagrant_vault'] }}"
+  loop_control:
+    index_var: item_idx
+
+- name: Create consul DNS request policy
+  shell: |
+    consul acl policy create -name "dns-requests" -rules - <<EOF
+    node_prefix "" {
+      policy = "read"
+    }
+    
+    service_prefix "" {
+      policy = "read"
+    }
+    EOF
+  environment:
+    CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+  when: ansible_hostname == first_host
+
+- name: Create consul vault-kv-write policy
+  shell: |
+    consul acl policy create -name "vault-kv-write" -rules - <<EOF
+    key_prefix "vault/" {
+      policy = "write"
+    }
+    EOF
+  environment:
+    CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+  when: ansible_hostname == first_host
+
+- name: Create consul vault-session-write policy
+  shell: |
+    consul acl policy create -name "{{ item }}-session-write" -rules - <<EOF
+    session_prefix "{{ item }}" {
+      policy = "write"
+    }
+    session_prefix "" {
+      policy = "read"
+    }
+    EOF
+  environment:
+    CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+  when: ansible_hostname == first_host
+  loop: "{{ groups['vagrant_vault'] }}"
+
+- name: Create consul vault-server role
+  shell: |
+    consul acl role create \
+      -name "vault-server-{{ item }}" \
+      -description "role for vault server" \
+      -policy-name dns-requests \
+      -policy-name vault-kv-write \
+      -policy-name {{ item }}-session-write
+  environment:
+    CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+  when: ansible_hostname == first_host
+  loop: "{{ groups['vagrant_vault'] }}"
+
+- name: Create vault server token policy for each consul clients
+  shell: |
+    consul acl token create \
+      -description "{{ item }} - vault server token" \
+      -role-name "vault-server-{{ item }}" \
+      -node-identity "{{ item }}:{{ consul_dcs.results[item_idx].stdout }}"
+  environment:
+    CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+  register: raw_vault_server_tokens
+  when: ansible_hostname == first_host
+  loop: "{{ groups['vagrant_vault'] }}"
+  loop_control:
+    index_var: item_idx
+
+- name: Create vault service token for each consul clients
+  shell: |
+    consul acl token create \
+      -description "vault service token for {{ item }}" \
+      -role-name "vault-server-{{ item }}" \
+      -service-identity "vault"
+  environment:
+    CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+  register: raw_vault_service_tokens
+  when: ansible_hostname == first_host
+  loop: "{{ groups['vagrant_vault'] }}"
+
+- name: Save the agent tokens
+  set_fact:
+    agent_tokens: "{{ agent_tokens | default({}) | combine({ r.item : r.stdout_lines[1]|split(' ')|last }) }}"
+  loop: "{{ raw_agent_tokens.results }}"
+  loop_control:
+    loop_var: r
+  when: ansible_hostname == first_host
+
+- name: Save the vault server tokens
+  set_fact:
+    vault_server_tokens: "{{ vault_server_tokens | default({}) | combine({ r.item : r.stdout_lines[1]|split(' ')|last }) }}"
+  loop: "{{ raw_vault_server_tokens.results }}"
+  loop_control:
+    loop_var: r
+  when: ansible_hostname == first_host
+
+- name: Save the vault service token
+  set_fact:
+    vault_service_tokens: "{{ vault_service_tokens | default({}) | combine({ r.item : r.stdout_lines[1]|split(' ')|last }) }}"
+  loop: "{{ raw_vault_service_tokens.results }}"
+  loop_control:
+    loop_var: r
+  when: ansible_hostname == first_host
+
+- name: Gathering server data centers
+  shell: consul members | grep {{ ansible_hostname }} | awk '{print $7}'
+  environment:
+    CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+  register: datacenter
+
+- name: Create consul agent token for each consul clients
+  shell: |
+    consul acl token create \
+      -description "{{ ansible_hostname }} - agent token" \
+      -policy-name dns-requests \
+      -node-identity "{{ ansible_hostname }}:{{ datacenter.stdout }}"
+  environment:
+    CONSUL_HTTP_TOKEN: "{{ consul_token }}"
+  register: server_token
+
+- name: Put token block
+  blockinfile:
+    path: /etc/consul.d/consul.hcl
+    insertafter: "^\\s*enable_token_persistence.*"
+    block: |2
+    
+        tokens {
+          default = "{{ server_token.stdout_lines[1]|split(' ')|last }}"
+        }
+
+- name: Restart consul service
+  systemd:
+    state: restarted
+    name: consul
