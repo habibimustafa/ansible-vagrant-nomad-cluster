@@ -1,0 +1,36 @@
+---
+- set_fact:
+    encryption_key: "{{ hostvars['localhost'].encryption_key }}"
+
+- shell: cat /etc/consul.d/consul.hcl
+  register: consul_conf
+
+- debug:
+    msg: "{{ consul_conf.stdout_lines }}"
+
+- lineinfile:
+    path: /etc/consul.d/consul.hcl
+    state: absent
+    regexp: "^encrypt"
+
+- lineinfile:
+    path: /etc/consul.d/consul.hcl
+    line: "encrypt = \"{{ encryption_key }}\""
+    insertafter:
+
+- shell: cat /etc/consul.d/consul.hcl
+  register: consul_conf
+
+- debug:
+    msg: "{{ consul_conf.stdout_lines }}"
+
+- systemd:
+    state: restarted
+    name: consul
+
+- shell: consul keyring -list
+  ignore_errors: true
+  retries: 3
+  delay: 3
+  register: keyring_check
+  until: keyring_check.rc == 0

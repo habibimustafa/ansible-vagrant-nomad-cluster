@@ -14,65 +14,28 @@
   vars_files:
     - vars/variables.prod.yml
 
-  roles:
-    - vagrant-newnode
-
-- hosts: vagrant_*
-  become: true
-
-  vars:
-    ansible_host_key_checking: false
-
   tasks:
     - set_fact:
         encryption_key: "{{ lookup('community.general.random_string', length=32, base64=True) }}"
-      when:
-        - encryption_key is undefined
-        - ansible_hostname == (ansible_play_hosts|first)
+      when: encryption_key is undefined
 
-    - set_fact:
-        encryption_key: "{{ hostvars[ansible_play_hosts|first].encryption_key }}"
-      when:
-        - encryption_key is undefined
-        - ansible_hostname != (ansible_play_hosts|first)
+    - include_role:
+        name: vagrant-newnode
 
-    - shell: cat /etc/consul.d/consul.hcl
-      register: consul_conf
-
-    - debug:
-        msg: "{{ consul_conf.stdout_lines }}"
-
-    - lineinfile:
-        path: /etc/consul.d/consul.hcl
-        state: absent
-        regexp: "^encrypt"
-
-    - lineinfile:
-        path: /etc/consul.d/consul.hcl
-        line: "encrypt = \"{{ encryption_key }}\""
-        insertafter:
-
-    - shell: cat /etc/consul.d/consul.hcl
-      register: consul_conf
-
-    - debug:
-        msg: "{{ consul_conf.stdout_lines }}"
-
-- hosts: vagrant_*
+- hosts: vagrant_consul
   become: true
-  serial: true
 
   vars:
     ansible_host_key_checking: false
 
-  tasks:
-    - systemd:
-        state: restarted
-        name: consul
+  roles:
+    - consul-encrypt
 
-    - shell: consul keyring -list
-      ignore_errors: true
-      retries: 3
-      delay: 3
-      register: keyring_check
-      until: keyring_check.rc == 0
+- hosts: vagrant_*:!vagrant_consul
+  become: true
+
+  vars:
+    ansible_host_key_checking: false
+
+  roles:
+    - consul-encrypt
