@@ -27,7 +27,7 @@
   roles:
     - vagrant-newnode
 
-- hosts: vagrant_consul,vagrant_vault
+- hosts: vagrant_*
   become: true
 
   vars:
@@ -68,7 +68,7 @@
     - debug:
         msg: "{{ consul_conf.stdout_lines }}"
 
-- hosts: vagrant_consul,vagrant_vault
+- hosts: vagrant_*
   become: true
   serial: true
 
