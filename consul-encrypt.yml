@@ -52,10 +52,10 @@
     - debug:
         msg: "{{ consul_conf.stdout_lines }}"
 
-#    - lineinfile:
-#        path: /etc/consul.d/consul.hcl
-#        state: absent
-#        regexp: "^encrypt"
+    - lineinfile:
+        path: /etc/consul.d/consul.hcl
+        state: absent
+        regexp: "^encrypt"
 
     - lineinfile:
         path: /etc/consul.d/consul.hcl
