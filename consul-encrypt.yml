@@ -33,10 +33,19 @@
   vars:
     ansible_host_key_checking: false
 
-  vars_files:
-    - vars/consul_encrypt.prod.yml
-
   tasks:
+    - set_fact:
+        encryption_key: "{{ lookup('community.general.random_string', length=32, base64=True) }}"
+      when:
+        - encryption_key is undefined
+        - ansible_hostname == (ansible_play_hosts|first)
+
+    - set_fact:
+        encryption_key: "{{ hostvars[ansible_play_hosts|first].encryption_key }}"
+      when:
+        - encryption_key is undefined
+        - ansible_hostname != (ansible_play_hosts|first)
+
     - shell: cat /etc/consul.d/consul.hcl
       register: consul_conf
 
