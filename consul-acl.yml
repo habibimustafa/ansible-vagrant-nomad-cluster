@@ -247,15 +247,6 @@
     ansible_host_key_checking: false
 
   tasks:
-    - name: Put vault unseal script
-      copy:
-        content: |
-          #/bin/env bash
-          
-          for i in {0..2}; do vault operator unseal $(cat /home/vagrant/vault_tokens.json | jq .unseal_keys_b64[$i] | xargs); done
-        dest: /usr/local/bin/vault-unseal
-        mode: 0755
-
     - set_fact: agent_token="{{ hostvars[groups['vagrant_consul']|first].agent_tokens[ansible_hostname] }}"
     - set_fact: vault_server_token="{{ hostvars[groups['vagrant_consul']|first].vault_server_tokens[ansible_hostname] }}"
     - set_fact: vault_service_token="{{ hostvars[groups['vagrant_consul']|first].vault_service_tokens[ansible_hostname] }}"
