@@ -22,7 +22,8 @@ Vagrant.configure("2") do |config|
   cluster_ips = {{ cluster.key|upper }}_CLUSTER_IPS
   cluster_prefix = {{ cluster.key|upper }}_PREFIX
   cluster_ips.each_with_index do |node_ip, index|
-    box_hostname = "#{cluster_prefix}-#{index+1}"
+    node_suffix = node_ip.split('.')[-1][-1]
+    box_hostname = "#{cluster_prefix}-#{node_suffix}"
     config.vm.define box_hostname do |node|
       node.vm.hostname = box_hostname
       node.vm.network "private_network", ip: node_ip
