@@ -70,7 +70,7 @@
     }
     
     service_prefix "" {
-      policy = "read"
+      policy = "write"
     }
     EOF
   environment:
