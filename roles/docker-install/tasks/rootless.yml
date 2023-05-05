@@ -125,3 +125,6 @@
     chmod +x $HOME/bin/docker-compose
   become: true
   become_user: "{{ docker_user }}"
+
+- name: Create docker socket symbolic link
+  shell: ln -s /run/user/{{ docker_user_info.uid }}/docker.sock /var/run/docker.sock
