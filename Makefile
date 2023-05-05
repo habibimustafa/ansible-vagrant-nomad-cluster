@@ -30,6 +30,10 @@ consul-acl:
 	export ANSIBLE_HOST_KEY_CHECKING=False && \
 	ansible-playbook -vv consul-acl.yml --ask-become-pass
 
+sentry:
+	export ANSIBLE_HOST_KEY_CHECKING=False && \
+	ansible-playbook -vv create-sentry.yml --ask-become-pass
+
 test:
 	export ANSIBLE_HOST_KEY_CHECKING=False && \
 	ansible-playbook -vv test.yml --ask-become-pass

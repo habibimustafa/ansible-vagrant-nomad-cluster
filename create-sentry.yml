@@ -1,0 +1,37 @@
+# create nodes
+- hosts: local
+  become: true
+  become_user: "{{ act_as }}"
+
+  vars:
+    node_group: "sentry"
+
+  vars_files:
+    - vars/variables.prod.yml
+
+  roles:
+    - vagrant-newnode
+
+# wait node ready
+- hosts: vagrant_sentry
+  become: true
+  gather_facts: no
+
+  roles:
+    - node-wait
+
+# provision
+- hosts: vagrant_sentry
+  become: true
+
+  vars:
+    consul_retry_join: "{{ clusters['consul'] }}"
+    docker_rootfull: true
+
+  vars_files:
+    - vars/variables.prod.yml
+
+  roles:
+    - basic
+    - docker-install
+    - sentry-install

@@ -1,0 +1,13 @@
+---
+- name: Clone self hosted sentry repository
+  git:
+    repo: https://github.com/getsentry/self-hosted.git
+    dest: /opt/sentry
+    depth: 1
+    force: yes
+    accept_hostkey: yes
+
+- name: Installing sentry
+  shell: ./install.sh --skip-user-prompt
+  args:
+    chdir: /opt/sentry
