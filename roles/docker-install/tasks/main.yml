@@ -2,8 +2,16 @@
 - name: Setup base packages
   include_tasks: apt.yml
 
+- name: Setup docker rootfull
+  include_tasks: rootfull.yml
+  when:
+    - docker_rootfull is defined
+    - docker_rootfull is true
+
 - name: Creating docker user
   include_tasks: user.yml
+  when: docker_rootfull is undefined or docker_rootfull is false
 
 - name: Setup docker rootless
   include_tasks: rootless.yml
+  when: docker_rootfull is undefined or docker_rootfull is false

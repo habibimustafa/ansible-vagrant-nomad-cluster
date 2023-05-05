@@ -13,6 +13,16 @@ apt_packages:
   - python3-six
   - uidmap
 
+# rootfull
+docker_repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu bionic stable"
+docker_key: "https://download.docker.com/linux/ubuntu/gpg"
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+  - docker-compose-plugin
+
+# rootless
 docker_user: dckr
 docker_release: "20.10.23"
 docker_release_shasum: "0ee39f72cc434137d294c14d30897826bad6e24979e421f51a252769ad37e6d1"
