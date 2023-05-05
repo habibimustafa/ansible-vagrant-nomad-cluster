@@ -118,3 +118,10 @@
   with_items:
     - "{{ docker_user_info.home }}/docker-{{ docker_release }}.tgz"
     - "{{ docker_user_info.home }}/docker-rootless-extras-{{ docker_release }}.tgz"
+
+- name: Installing rootless docker compose
+  shell: |
+    curl -L --fail {{ docker_compose_rootless }} -o $HOME/bin/docker-compose
+    chmod +x $HOME/bin/docker-compose
+  become: true
+  become_user: "{{ docker_user }}"

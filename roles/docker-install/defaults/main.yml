@@ -29,6 +29,7 @@ docker_release_shasum: "0ee39f72cc434137d294c14d30897826bad6e24979e421f51a252769
 docker_release_rootless_shasum: "2b3ec9db6d4f8f9059b45f3c5a12fc4c2bc8c97a053bf6855c9f71f3a556097a"
 docker_bash_completion_shasum: "cd9c70120bc5f7e6772b6a5350abf63099004c357814abc8a8a3689a7f2e3df0"
 docker_url: "https://download.docker.com/linux/static/stable/x86_64"
+docker_compose_rootless: "https://github.com/docker/compose/releases/download/1.28.5/run.sh"
 
 slirp4netns_version: "1.2.0"
 slirp4netns_url: https://github.com/rootless-containers/slirp4netns/releases/download
