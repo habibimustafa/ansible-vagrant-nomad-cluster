@@ -26,7 +26,6 @@
 
   vars:
     consul_retry_join: "{{ clusters['consul'] }}"
-    docker_rootfull: true
 
   vars_files:
     - vars/variables.prod.yml
