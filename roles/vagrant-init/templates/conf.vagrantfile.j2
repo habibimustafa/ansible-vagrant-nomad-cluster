@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 PUBLIC_KEY = "{{ public_key_path }}"
-{% for cluster in lookup('dict', clusters) %}
+{% for cluster in lookup('dict', clusters, wantlist=True) %}
 
 {{ cluster.key|upper }}_PREFIX = "{{ cluster.key }}"
 {{ cluster.key|upper }}_CLUSTER_IPS = [ "{{ cluster.value|join('\", \"') }}" ]
@@ -14,7 +14,7 @@ Vagrant.configure("2") do |config|
     vb.memory = "{{ default_memory }}"
     vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
   end
-{% for cluster in lookup('dict', clusters) %}
+{% for cluster in lookup('dict', clusters, wantlist=True) %}
 
   ###################
   ####  {{ cluster.key|upper }}  ####
